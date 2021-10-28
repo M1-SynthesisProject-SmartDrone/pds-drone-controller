@@ -1,0 +1,27 @@
+Thread du drone nommé "drone sender"
+
+==== PHASE 1 : récupération des messages et thread de récup ====
+    On veut avoir un thread qui attend sur une file de messages et qui les récupère et les traite un par un.
+
+    ---- Conception ----
+        * SharedMessagesQueue
+            Le thread "android receiver" va ajouter des messages un par un dans l'ordre
+            Le thread "drone sender" va attendre tant qu'il n'y a pas de messages
+
+            On veut donc une queue qui locke le thread "drone sender" reelemet (pas de sleep(500) qui tienne, trop con)
+
+        * DroneSender_ThreadClass
+            C'est lui qui va gérer le thread "drone sender" (logique)
+
+            Doit avoir une ref vers le drone et le serial port
+
+            Dans un premier temps, il doit se bind sur le px4 (sinon le programme doit mourrir instantanément)
+
+            Une fois qu'il aura un message, il (ou une autre classe, mais je vois pas l'intérêt) fera la correspondance 
+            entre le message à envoyer et demandera de faire une action au drône
+                ==> Il doit aussi avoir un moyen de voir "SharedMessagesQueue"
+
+            On ne s'occupe pas des messages que le drône renverra pour l'instant, à part "ça marche" et "ça marche pas"
+
+    ---- Implem ----
+        - le DroneSender_ThreadClass ne doit pas créer tout seul de son côté le Drone ni le SerialPort

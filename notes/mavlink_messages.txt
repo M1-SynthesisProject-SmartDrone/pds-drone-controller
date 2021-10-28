@@ -1,0 +1,4 @@
+Point d'entrée : Thread_SerialPort.cpp ==> methode read_messages()
+On y voit 2 trucs : 
+    - On a plusieurs "msgid" à traiter differement (MAVLINK_MSG_ID_HEARTBEAT, MAVLINK_MSG_ID_SYS_STATUS, ...)
+    - Il y a des msgid qui sont commentés : soit il y a une erreur, soit ils s'en fichent de les traiter pour leur app

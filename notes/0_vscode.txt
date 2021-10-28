@@ -1,0 +1,38 @@
+==== Notes de base ====
+    * IL FAUT TOUJOURS OUVRIR DANS LE DOSSIER DU PROJET EN COURS, 
+    sinon la compilation va sûrement foirer et l'IDE va se plaindre h24.
+
+==== Debug avec F5 ==== 
+    La création du fichier de base ne va pas marcher, étant donné qu'on utilise cmake
+    ==> Go modifier les fichiers de config : 
+
+    * launch.json. On veut avior quelque chose comme ça :
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "program": "${workspaceRoot}/bin/SmartDroneController",
+                "name": "Debug",
+                "type": "cppdbg",
+                "request": "launch",
+                "target": "./bin/SmartDroneController",
+                "cwd": "${workspaceRoot}",
+                "preLaunchTask": "buildDebug"
+            }
+        ]
+    
+    * tasks.json. On veut ajouter ce task dans la liste de configurations (pas obligé de virer l'ancien) : 
+        {
+            "type": "shell",
+            "label": "buildDebug",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
+            "command": "cmake -DCMAKE_BUILD_TYPE=Debug ..; make"
+        }
+
+    F5 devrait créer les makefiles etc., compiler puis lancer le programme
+
+==== Accès aux librairies (i.e, certains #include foirent) ====
+    Aller dans le c_cpp_properties.json de votre workspace (encore une fois à la racine de ce projet)
+    Ajoutez dans la liste "include_path":
+        "${workspaceRoot}/lib/**"

@@ -1,0 +1,16 @@
+==== DESCRIPTION GENERALE ====
+    L'utilisateur de l'application utilise l'interface. à intervalles réguliers, l'application va envoyer
+    un message à la station au sol.
+
+    Lorsque le PC aura reçu le message, il devra le traduire et l'envoyer au drône.
+    Si aucun message n'est arrivé depuis un certain moment, il faudra faire en sorte que le drone ne bouge plus
+
+==== NOTES C++ ====
+    std::shared_ptr est utilisé enormément, pour une bonne raison : 
+        Tant qu'il y a qqch qui le connait, il ne détruit pas son contenu, sinon, il se détruit tt seul comme un grand
+        ==> pratique si on a besoin d'un même objet dans les classes différentes
+    
+    Tres important :
+    ON NE FAIT PAS "using namespace ..." dans un fichier .h.
+        Dans un fichier .cpp, c'est ok
+        ==> On ne veut pas forcer l'utilisateur de notre classe etc. à utiliser le namespace 

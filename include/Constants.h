@@ -1,0 +1,40 @@
+/**
+ *  @author Sylvain Colomer
+ *  @date 18/04/19.
+ */
+
+#ifndef CONSTANT_H
+#define CONSTANT_H
+
+// MAIN ENGINE
+#define ENGINE_COM_INIT_1 0
+#define ENGINE_COM_INIT_2 1
+#define ENGINE_COM_WORK 2
+#define ENGINE_COM_ERROR 3
+
+#define ENGINE_DRONES_INIT 0
+#define ENGINE_DRONES_WORK 1
+
+//THREAD
+#define STATE_THREAD_VOID 5
+#define STATE_THREAD_WORK 2
+#define STATE_THREAD_ERROR 3
+//EVENTS
+#define EVENT_EXIT 1
+#define EVENT_REPAINT 2
+#define EVENT_DEMO 3
+
+// DISPLAY
+#define NCURSES_TEXT_DEFAULT 1
+#define NCURSES_TEXT_GREEN 2
+#define NCURSES_TEXT_RED 3
+#define NCURSES_TEXT_ORANGE 4
+#define NCURSES_TEXT_BLUE 5
+
+#define NCURSES_WINDOW_1 6
+#define NCURSES_WINDOW_2 7
+
+#define NCURSES_LOG_MAX 100
+
+
+#endif 

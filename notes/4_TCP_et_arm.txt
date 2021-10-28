@@ -1,0 +1,18 @@
+* On va devoir se connecter à android en TCP 
+    ==> Une seule connexion à la fois
+
+* Une fois que la connexion est faite :
+    - on arme le drone direct
+    - on attend la réponse sur le thread receiver (CREER UN NOUVEAU THREAD):
+        . Si c'est bon, on continue
+        . Sinon, on déco l'app android et on repart au début
+ 
+* Pendant le vol, on envoie pas les réponses à l'app
+
+* Si l'app android se deco :
+    - Soit le drone à les moteurs éteins, et on peut le désarmer
+    - Sinon (le drone est en vol), on le pose (on ne prend pas le cas de l'eau)
+
+* Il faut une classe commune à tous les threads sur les infos du drone
+    - si connecté, armé
+    - Position, altitude, vitesse
