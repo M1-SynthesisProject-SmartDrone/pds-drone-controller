@@ -18,6 +18,7 @@
 #include "../network/Com_Mavlink.h"
 
 #include "../drone/Data_Drone.h"
+#include "../drone/DroneManualCommand.h"
 
 class DroneSender_ThreadClass : public Abstract_ThreadClass
 {

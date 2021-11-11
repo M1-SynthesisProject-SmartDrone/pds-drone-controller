@@ -137,6 +137,26 @@ int Drone::init_parameters(uint limit)
     return 0;
 }
 
+// %%%%%%%%%%%%%%%%%%%%%%%%%%% MANUAL_CONTROL API %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+int Drone::manual_control(DroneManualCommand manualCommand)
+{
+    // From the implementation of the message sent by joystick : 
+    // https://github.com/mavlink/qgroundcontrol/blob/master/src/Vehicle/Vehicle.cc (method "sendJoystickDataThreadSafe")
+    mavlink_message_t message;
+    short msgLength = mavlink_msg_manual_control_pack(
+        1, // system id
+        1, // component id
+        &message,
+        1, //target id
+        manualCommand.x,
+        manualCommand.y,
+        manualCommand.z,
+        manualCommand.r,
+        0 // buttons, none taken account for now
+    );
+    return write_message(message);
+}
+
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTROL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -2,10 +2,9 @@
 
 #include "../../lib/loguru/loguru.hpp"
 #include "../../include/threads/SharedMessagesQueue.h"
-#include "../../include/drone/DroneCommands.h"
 
 #include "../../include/network/Com_Mavlink.h"
-#include "../../include/global_variables.h"
+#include "../../include/global_variables.h" 
 
 #include <sstream>
 
@@ -29,20 +28,17 @@ void DroneSender_ThreadClass::run()
 {
     loguru::set_thread_name("drone sender");
     LOG_F(INFO, "Run drone sender thread");
-    // Ask drone to arm
+    // Ask drone to arm, doesn't change anything for now
     LOG_F(INFO, "Arm drone");
-    // m_drone.get()->make_mode(MAV_MODE_GUIDED_ARMED);
-    // m_drone.get()->command_arm(1);
-    // usleep(10000 * 1000); // wait 10 seconds
-    m_drone.get()->testThrottle(1);
-    usleep(1000 * 1000);
-    m_drone.get()->testThrottle(2);
-    usleep(1000 * 1000);
-    m_drone.get()->testThrottle(3);
-    usleep(1000 * 1000);
-    m_drone.get()->testThrottle(4);
-    usleep(10000 * 1000);
-    // m_drone.get()->command_arm(0);
+    m_drone.get()->command_arm(1);
+
+
+    // TODO : test the new command
+    // see DroneManualCommand for infos
+    short x = 0, y = 0, z = 10, r = 0;
+    DroneManualCommand manualCommand = {x, y, z, r};
+    // m_drone.get()->manual_control(manualCommand);
+
     while (isRunFlag())
     {
         
@@ -50,8 +46,6 @@ void DroneSender_ThreadClass::run()
         auto message = SharedMessagesQueue::getInstance()->pop();
         // LOG_F(INFO, "Process message : Action = %ld Value =%lf", message.action, message.value);
 
-        
-        
         // while (m_drone.get()->motors == Drone_Motors::UNARM);
 
         // depending on the action, do something
@@ -70,6 +64,9 @@ void DroneSender_ThreadClass::run()
 
 void DroneSender_ThreadClass::onMessageReceived(AndroidMessageReceived androidMessage)
 {
+
+    // TODO : if manual_control works, all below is useless and must be updated
+
     // We have multiple command values at once, we want to update the most important first
     // We will compare one by one and send an appropriate command
     if (m_currentMessageSent.motorPower != androidMessage.motorPower)

@@ -1,10 +1,10 @@
 /**
  * @brief Tool class which convey to open a serial port
  * @file serial_port.cpp
- * 
+ *
  * @author Sylvain ColomerJoystickModeAttitude
  * @date 19/04/19
- * @version 1.1 
+ * @version 1.1
  */
 
 #ifndef DRONE_H
@@ -26,11 +26,13 @@
 #include "../network/Com_Serial.h"
 #include "../network/Com_Wifi.h"
 
-//#include "common/mavlink_msg_compassmot_status.h"
+#include "../drone/DroneManualCommand.h"
 
-/**
- * Define about drone communication protocol. it's use to automatic open specific communication
- */
+ //#include "common/mavlink_msg_compassmot_status.h"
+
+ /**
+  * Define about drone communication protocol. it's use to automatic open specific communication
+  */
 enum Drone_Communication {
 	DRONE_WIFI,
 	DRONE_SERIAL,
@@ -40,7 +42,7 @@ enum Drone_Communication {
 /**
  * define about drone mode
  */
-enum Drone_Motors{
+enum Drone_Motors {
 	ARM,
 	UNARM
 };
@@ -48,66 +50,66 @@ enum Drone_Motors{
 /**
  * define about drone mode
  */
-enum Drone_mode{
+enum Drone_mode {
 	DRONE_OFF,
 	DRONE_MANUAL_DIRECT
-	
+
 	// Mode manual with direct control of the motors
 };
 
 
- enum class FlightMode {
-        Unknown,
-        Ready,
-        Takeoff,
-        Hold,
-        Mission,
-        ReturnToLaunch,
-        Land,
-        Offboard,
-        FollowMe,
-        Manual,
-        Altctl,
-        Posctl,
-        Acro,
-        Rattitude,
-        Stabilized,
-    };
+enum class FlightMode {
+	Unknown,
+	Ready,
+	Takeoff,
+	Hold,
+	Mission,
+	ReturnToLaunch,
+	Land,
+	Offboard,
+	FollowMe,
+	Manual,
+	Altctl,
+	Posctl,
+	Acro,
+	Rattitude,
+	Stabilized,
+};
 
 
 namespace px4 {
 
-enum PX4_CUSTOM_MAIN_MODE {
-    PX4_CUSTOM_MAIN_MODE_MANUAL = 1,
-    PX4_CUSTOM_MAIN_MODE_ALTCTL,
-    PX4_CUSTOM_MAIN_MODE_POSCTL,
-    PX4_CUSTOM_MAIN_MODE_AUTO,
-    PX4_CUSTOM_MAIN_MODE_ACRO,
-    PX4_CUSTOM_MAIN_MODE_OFFBOARD,
-    PX4_CUSTOM_MAIN_MODE_STABILIZED,
-    PX4_CUSTOM_MAIN_MODE_RATTITUDE
-};
+	enum PX4_CUSTOM_MAIN_MODE {
+		PX4_CUSTOM_MAIN_MODE_MANUAL = 1,
+		PX4_CUSTOM_MAIN_MODE_ALTCTL,
+		PX4_CUSTOM_MAIN_MODE_POSCTL,
+		PX4_CUSTOM_MAIN_MODE_AUTO,
+		PX4_CUSTOM_MAIN_MODE_ACRO,
+		PX4_CUSTOM_MAIN_MODE_OFFBOARD,
+		PX4_CUSTOM_MAIN_MODE_STABILIZED,
+		PX4_CUSTOM_MAIN_MODE_RATTITUDE
+	};
 
-enum PX4_CUSTOM_SUB_MODE_AUTO {
-    PX4_CUSTOM_SUB_MODE_AUTO_READY = 1,
-    PX4_CUSTOM_SUB_MODE_AUTO_TAKEOFF,
-    PX4_CUSTOM_SUB_MODE_AUTO_LOITER,
-    PX4_CUSTOM_SUB_MODE_AUTO_MISSION,
-    PX4_CUSTOM_SUB_MODE_AUTO_RTL,
-    PX4_CUSTOM_SUB_MODE_AUTO_LAND,
-    PX4_CUSTOM_SUB_MODE_AUTO_RTGS,
-    PX4_CUSTOM_SUB_MODE_AUTO_FOLLOW_TARGET
-};
+	enum PX4_CUSTOM_SUB_MODE_AUTO {
+		PX4_CUSTOM_SUB_MODE_AUTO_READY = 1,
+		PX4_CUSTOM_SUB_MODE_AUTO_TAKEOFF,
+		PX4_CUSTOM_SUB_MODE_AUTO_LOITER,
+		PX4_CUSTOM_SUB_MODE_AUTO_MISSION,
+		PX4_CUSTOM_SUB_MODE_AUTO_RTL,
+		PX4_CUSTOM_SUB_MODE_AUTO_LAND,
+		PX4_CUSTOM_SUB_MODE_AUTO_RTGS,
+		PX4_CUSTOM_SUB_MODE_AUTO_FOLLOW_TARGET
+	};
 
-union px4_custom_mode {
-    struct {
-        uint16_t reserved;
-        uint8_t main_mode;
-        uint8_t sub_mode;
-    };
-    uint32_t data;
-    float data_float;
-};
+	union px4_custom_mode {
+		struct {
+			uint16_t reserved;
+			uint8_t main_mode;
+			uint8_t sub_mode;
+		};
+		uint32_t data;
+		float data_float;
+	};
 
 } // namespace px4
 
@@ -122,27 +124,27 @@ public:
 
 	Drone_Communication drone_communication;
 
-	Drone_Motors motors=UNARM;	
-//	Drone_mode mode=DRONE_OFF;
+	Drone_Motors motors = UNARM;
+	//	Drone_mode mode=DRONE_OFF;
 
-	
-	//Communication part
-	Drone_Communication communication=DRONE_SERIAL;
+
+		//Communication part
+	Drone_Communication communication = DRONE_SERIAL;
 	std::shared_ptr<Serial_Port> serial1;
 	std::shared_ptr<Wifi_Port> wifi1;
 
-	
+
 	//Drone system var
-	uint8_t system_id=-1;
-	uint8_t component_id=-1;
-	uint8_t autopilot_id=-1;
+	uint8_t system_id = -1;
+	uint8_t component_id = -1;
+	uint8_t autopilot_id = -1;
 
 	// Var use in remote mode to control the drone. 
 	// Warning: if the value are highter than 0 before, it will be dangerous because the drone will make an hight jump
-	int remote_x=0;
-	int remote_y=0;
-	int remote_z=0;
-	int remote_r=0;
+	int remote_x = 0;
+	int remote_y = 0;
+	int remote_z = 0;
+	int remote_r = 0;
 
 	// Timestamp use for relative navigation
 	uint64_t timestamps;
@@ -151,32 +153,32 @@ public:
 	mavlink_heartbeat_t heartbeat; //Heartbeat. gather Id and others
 	mavlink_command_ack_t ack; //Ack command: one of the most usefull parameters. it convey to read return of command
 	mavlink_sys_status_t sys_status;
-    mavlink_ping_t ping;
-    mavlink_param_value_t param_value;
-    mavlink_servo_output_raw_t servo_output_raw;
+	mavlink_ping_t ping;
+	mavlink_param_value_t param_value;
+	mavlink_servo_output_raw_t servo_output_raw;
 	mavlink_battery_status_t battery_status;
-    mavlink_autopilot_version_t autopilot_version;
-    mavlink_estimator_status_t estimator_status;
-    mavlink_vibration_t vibration;
-    mavlink_extended_sys_state_t extended_sys_state;
+	mavlink_autopilot_version_t autopilot_version;
+	mavlink_estimator_status_t estimator_status;
+	mavlink_vibration_t vibration;
+	mavlink_extended_sys_state_t extended_sys_state;
 	mavlink_radio_status_t radio_status;
 
-    mavlink_highres_imu_t highres_imu; //Accelerometers of the system
+	mavlink_highres_imu_t highres_imu; //Accelerometers of the system
 	mavlink_altitude_t altitude; //Altitude data
 	mavlink_home_position_t home_position;
 
 	mavlink_attitude_t attitude; //Attitude of the drone use to manual control and target attitude
-    mavlink_attitude_target_t attitude_target; //Attitude of the drone use to manual control and target attitude
+	mavlink_attitude_target_t attitude_target; //Attitude of the drone use to manual control and target attitude
 
 	mavlink_global_position_int_t global_position_int;
 
-    mavlink_local_position_ned_t local_position_ned;
-    mavlink_position_target_local_ned_t position_target_local_ned;
-    mavlink_gps_raw_int_t gps_raw_int;
-     mavlink_command_long_t command_long;
-    
-    int departure_alt;
-	
+	mavlink_local_position_ned_t local_position_ned;
+	mavlink_position_target_local_ned_t position_target_local_ned;
+	mavlink_gps_raw_int_t gps_raw_int;
+	mavlink_command_long_t command_long;
+
+	int departure_alt;
+
 public:
 
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTRUCTOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -189,8 +191,8 @@ public:
 	Drone(std::string serialPort_path, int serialPort_baudrate);
 
 	~Drone();
-	
-	void open(char *serialPort_path, int serialPort_baudrate);
+
+	void open(char* serialPort_path, int serialPort_baudrate);
 
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% COMMUNICATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -198,7 +200,7 @@ public:
 	 * Function which convey to get message from selected connection
 	 * By defalt, we use serial port communication (radio or usb)
 	 */
-	int read_message(mavlink_message_t &message); //int communicationWay
+	int read_message(mavlink_message_t& message); //int communicationWay
 
 	/**
 	 * Method that allow to write message with a specific communication protocol
@@ -206,7 +208,7 @@ public:
 	int write_message(mavlink_message_t message);
 
 	/**
-	 * 
+	 *
 	 */
 	int write_message(mavlink_message_t message, Drone_Communication protocol);
 
@@ -227,31 +229,38 @@ public:
 	 */
 	int init_parameters(uint limit);
 
+	// %%%%%%%%%%%%%%%%%%%%%%%%%%% MANUAL_CONTROL API %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	/**
+	 * Send a command to control the drone with the same api as with a joystick.
+	 */
+	int manual_control(DroneManualCommand manualCommand);
+
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTROL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 	/**
 	 * Convey to change the mode of the drone
 	 */
 	int command_setMode(Drone_mode my_mode);
-	
+
 
 	int command_arm(int param1);
-	
+
 	//int command_float(int param1);
 
 
 	int command_kill(int param1);
 
-//	int command_setModeGuided(float param1);
+	//	int command_setModeGuided(float param1);
 	int make_command_msg_rate(int param1);
 	int command_directControl(float x, float y, float z, float r);
 	int move_drone_to(float x, float y, float z);
 	int return_to_launch(int param1);
-	int take(int param1) ;
+	int take(int param1);
 	int take_off();
 	int landing();
-	int command_right(float param1) ;
-	int command_left(float param1) ;
+	int command_right(float param1);
+	int command_left(float param1);
 	int go_to();
 	int waypoint(float param5, float param6, float param7);
 	int battery_check(float x);
@@ -270,14 +279,13 @@ public:
 
 	int move_to(float param1, float param2, float param3);
 
-	int command_up(float param1) ;
-	int command_down(float param1) ;
-	int command_pow(float param1) ;
+	int command_up(float param1);
+	int command_down(float param1);
+	int command_pow(float param1);
 
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ? %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 	mavlink_command_long_t mavlink_newCommand();
-
 };
 
 

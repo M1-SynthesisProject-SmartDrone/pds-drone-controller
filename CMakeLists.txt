@@ -131,7 +131,6 @@ add_executable(
     src/Main.cpp
 
     include/Constants.h
-    include/drone/DroneCommands.h
     include/global_variables.h
 
     # Network related files
@@ -148,7 +147,7 @@ add_executable(
 
     # Drone related files
     include/drone/Data_Drone.h
-    include/drone/DroneCommands.h
+    include/drone/DroneManualCommand.h
     src/drone/Data_Drone.cpp
     
 
