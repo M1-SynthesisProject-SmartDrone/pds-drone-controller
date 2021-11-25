@@ -10,7 +10,7 @@
 #define __DRONESENDER_THREADCLASS_H__
 
 #include "Abstract_ThreadClass.h"
-#include "SharedMessagesQueue.h"
+#include "SharedMessage.h"
 
 #include "../android/message/AndroidMessageReceived.h"
 

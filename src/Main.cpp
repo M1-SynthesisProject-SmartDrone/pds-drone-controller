@@ -12,7 +12,7 @@
 #include "../include/threads/Abstract_ThreadClass.h"
 #include "../include/threads/AndroidReceiver_ThreadClass.h"
 #include "../include/threads/DroneSender_ThreadClass.h"
-#include "../include/threads/SharedMessagesQueue.h"
+#include "../include/threads/SharedMessage.h"
 #include "../include/network/Com_Serial.h"
 #include "../include/drone/Data_Drone.h"
 

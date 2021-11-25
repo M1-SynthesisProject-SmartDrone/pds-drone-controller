@@ -1,7 +1,7 @@
 #include "../../include/threads/DroneSender_ThreadClass.h"
 
 #include "../../lib/loguru/loguru.hpp"
-#include "../../include/threads/SharedMessagesQueue.h"
+#include "../../include/threads/SharedMessage.h"
 
 #include "../../include/network/Com_Mavlink.h"
 #include "../../include/global_variables.h" 
@@ -43,7 +43,7 @@ void DroneSender_ThreadClass::run()
     {
         
         // wait for message to come, then send it to the drone
-        auto message = SharedMessagesQueue::getInstance()->pop();
+        auto message = SharedMessage::getInstance()->pop();
         // LOG_F(INFO, "Process message : Action = %ld Value =%lf", message.action, message.value);
 
         // while (m_drone.get()->motors == Drone_Motors::UNARM);

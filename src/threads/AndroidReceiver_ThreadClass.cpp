@@ -2,7 +2,7 @@
 
 #include "../../lib/loguru/loguru.hpp"
 #include "../../include/android/AndroidReceiver.h"
-#include "../../include/threads/SharedMessagesQueue.h"
+#include "../../include/threads/SharedMessage.h"
 
 using namespace std;
 
@@ -43,7 +43,7 @@ void AndroidReceiver_ThreadClass::run()
             messageReceived = androidReceiver.receiveMessage();
             LOG_F(INFO, "Message received ! LeftMove = %lf, LeftRotation = %lf, ForwardMove = %lf, MotorPower = %lf", 
                 messageReceived.leftMove, messageReceived.leftRotation, messageReceived.forwardMove, messageReceived.motorPower);
-            SharedMessagesQueue::getInstance()->add(messageReceived);
+            SharedMessage::getInstance()->add(messageReceived);
         }
         catch (const std::exception &e)
         {

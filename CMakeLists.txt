@@ -163,9 +163,9 @@ add_executable(
     include/threads/Abstract_ThreadClass.h
     include/threads/AndroidReceiver_ThreadClass.h
     include/threads/DroneSender_ThreadClass.h
-    include/threads/SharedMessagesQueue.h
+    include/threads/SharedMessage.h
     src/threads/Abstract_ThreadClass.cpp
     src/threads/AndroidReceiver_ThreadClass.cpp
     src/threads/DroneSender_ThreadClass.cpp
-    src/threads/SharedMessagesQueue.cpp
+    src/threads/SharedMessage.cpp
 )
