@@ -17,15 +17,28 @@
 #include <memory>
 #include <algorithm>
 
-//#include <loguru.hpp>
-
-#define THREAD_STATE_VOID 0 // Thread created and ready to be used
-#define THREAD_STATE_READY 1 // Thread created and ready to be used
-#define THREAD_STATE_WORK_TASK 2
-#define THREAD_STATE_WORK_SLEEP 3
-#define THREAD_STATE_WORK_DEADLINE 4
-
-
+/**
+ * A thread have multiple state during is life
+ *  TO_INIT -> Not initialised thread
+ *  INIT -> Thread in initialisation
+ *  READY -> Thread ready to be start
+ *  RUN -> Thread which work
+ *  STOP -> Thread stopped
+ *  QUIT -> Thread in quit process
+ *  PROBLEM -> Blocked thread in reason of a problem
+ *  DEADLINE_EXCEEDED -> thread
+ *
+ */
+enum LifeCoreState {
+    TO_INIT,
+    INIT,
+    READY,
+    RUN,
+    STOP,
+    QUIT,
+    PROBLEM,
+    DEADLINE_EXCEEDED
+};
 
 /**
  * Abstract class which convey to implement a thread brick
@@ -33,8 +46,8 @@
  */
 class Abstract_ThreadClass {
     
-protected:
 
+public :
     // REAL TIME VAR
     /**
      * timeval that save the begin of the running method
@@ -69,19 +82,20 @@ protected:
     /**
      * Run flag : convey to loop the system
      */
-    volatile bool runFlag = true;
+    bool runFlag = true;
 
     // MAIN THREAD VAR
     /**
      * The principal thread of the system
      */
     std::thread principalThread;
-    /**
-     * State flag use to know current state of the tread
-     */
-    int state = THREAD_STATE_VOID;
 
-public :
+    /**
+     * Var use to share the state of the system
+     */
+    LifeCoreState currentState=LifeCoreState::TO_INIT;;
+
+
 
     /**
      * Default constructor : take in parameters the task period time and the task deadline time
@@ -113,10 +127,10 @@ public :
     void stop();
 
     /**
-     * Warning : bad method
+     * Stop function : convey to stop the thread without join()
+     * Warning : it usage is not recommended if the user don't understand it interest. (usually to exit the main core)
      */
-    void stop_force();
-
+    void lazyStop();
 
     /**
      * Play method : convey to restart the thread before a first start and after a pause
@@ -146,8 +160,19 @@ public :
      * Only a setter
      * @return
      */
-    bool isRunFlag();
+    bool isRunFlag() const;
 
+    /**
+     * Setter of the run mutex : need to unlock the mutex
+     * @param runFlag
+     */
+    void setRunFlag(bool runFlag);
+
+    /**
+     * Only a getter
+     * @return
+     */
+    LifeCoreState getCurrentState() const;
 
 };
 

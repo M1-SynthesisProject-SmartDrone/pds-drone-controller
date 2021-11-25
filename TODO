@@ -1,2 +1,0 @@
- - Handle the TCP connection 
- - Catch all ending signals, in order to end threadss

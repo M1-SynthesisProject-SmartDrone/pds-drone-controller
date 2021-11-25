@@ -12,6 +12,7 @@
 #include "../include/threads/Abstract_ThreadClass.h"
 #include "../include/threads/AndroidReceiver_ThreadClass.h"
 #include "../include/threads/DroneSender_ThreadClass.h"
+#include "../include/threads/DroneReceiver_ThreadClass.h"
 #include "../include/threads/SharedMessage.h"
 #include "../include/network/Com_Serial.h"
 #include "../include/drone/Data_Drone.h"
@@ -89,6 +90,7 @@ int main(int argc, char* argv[])
     if (useDrone)
     {
         threads.push_back(new DroneSender_ThreadClass(1000, 200, drone));
+        threads.push_back(new DroneReceiver_ThreadClass(1000, 200, drone));
     }
 
     // start all threads
@@ -102,8 +104,6 @@ int main(int argc, char* argv[])
     {
         thread->join();
     }
-
-    // serialPort.get()->close_serial();
 
     return EXIT_SUCCESS;
 }
