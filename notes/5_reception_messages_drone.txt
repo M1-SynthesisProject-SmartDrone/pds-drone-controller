@@ -1,0 +1,16 @@
+On a le drone receiver qui va devoir update les données du drone petit à petit
+
+    - Armement, désarmement
+    - état (en vol, au sol)
+    - Position, rotation, vitesse
+    - Commande en cours (peut être mieux par le drone sender, vu que c'est lui qui envoie l'action)
+
+On va aussi avoir une redirection des messages vers Android
+    --> Besoin de créer un nouveau thread pour le serveur udp dans le sens inverse avec :
+        * Armement reussi
+            --> Pas tout le temps OU si en fait (plus facile à gérer)
+        * En vol ou pas
+        * Altitude
+
+    --> Besoin de créer un pont de données entre les deux 
+        OU SINON le thread prendrait juste les données de l'instance de Drone directement (c'est à ça que ça sert...)

@@ -2,7 +2,8 @@
 #define __DRONERECEIVER_THREADCLASS_H__
 
 /**
- * This thread will wait for messages comming from the drone.
+ * This thread will wait for messages comming from the drone and update 
+ * the drone stats depending on those.
  * 
  * @author Aldric Vitali Silvestre
  */
