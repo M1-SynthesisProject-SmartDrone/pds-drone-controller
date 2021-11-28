@@ -2,9 +2,9 @@
 #define __DRONERECEIVER_THREADCLASS_H__
 
 /**
- * This thread will wait for messages comming from the drone and update 
+ * This thread will wait for messages comming from the drone and update
  * the drone stats depending on those.
- * 
+ *
  * @author Aldric Vitali Silvestre
  */
 
@@ -15,7 +15,9 @@ class DroneReceiver_ThreadClass : public Abstract_ThreadClass
 {
 private:
     std::shared_ptr<Drone> m_drone;
-   
+
+    void updateDroneData(mavlink_altitude_t altitideData);
+    void updateDroneData(mavlink_command_ack_t commandAck);
 
 public:
     DroneReceiver_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone);
