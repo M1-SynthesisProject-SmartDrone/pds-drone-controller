@@ -32,7 +32,7 @@ void AndroidReceiver_ThreadClass::run()
         exit(EXIT_FAILURE);
     }
     // wait messages
-    AndroidMessageReceived messageReceived;
+    Abstract_AndroidReceivedMessage messageReceived;
     LOG_F(INFO, "Start listening for messages");
     while (isRunFlag())
     {
@@ -40,8 +40,7 @@ void AndroidReceiver_ThreadClass::run()
         try
         {
             messageReceived = androidReceiver.receiveMessage();
-            LOG_F(INFO, "Message received ! LeftMove = %lf, LeftRotation = %lf, ForwardMove = %lf, MotorPower = %lf", 
-                messageReceived.leftMove, messageReceived.leftRotation, messageReceived.forwardMove, messageReceived.motorPower);
+            LOG_F(INFO, messageReceived.toString().c_str());
             SharedMessage::getInstance()->add(messageReceived);
         }
         catch (const std::exception &e)

@@ -14,10 +14,6 @@ DroneSender_ThreadClass::DroneSender_ThreadClass(int task_period, int task_deadl
     : Abstract_ThreadClass(task_period, task_deadline)
 {
     m_drone = drone;
-    m_currentMessageSent.forwardMove = 0;
-    m_currentMessageSent.leftMove = 0;
-    m_currentMessageSent.leftRotation = 0;
-    m_currentMessageSent.motorPower = 0;
 }
 
 DroneSender_ThreadClass::~DroneSender_ThreadClass()
@@ -62,55 +58,9 @@ void DroneSender_ThreadClass::run()
     m_drone.get()->command_arm(0);
 }
 
-void DroneSender_ThreadClass::onMessageReceived(AndroidMessageReceived androidMessage)
+void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage androidMessage)
 {
 
     // TODO : if manual_control works, all below is useless and must be updated
-
-    // We have multiple command values at once, we want to update the most important first
-    // We will compare one by one and send an appropriate command
-    if (m_currentMessageSent.motorPower != androidMessage.motorPower)
-    {
-        treatMotorPower(androidMessage.motorPower);
-    }
-    else if (m_currentMessageSent.forwardMove != androidMessage.forwardMove)
-    {
-        treatForwardMove(androidMessage.forwardMove);
-    }
-    else if (m_currentMessageSent.leftMove != androidMessage.leftMove)
-    {
-        treatLeftMove(androidMessage.leftMove);
-    }
-    else if (m_currentMessageSent.leftRotation != androidMessage.leftRotation)
-    {
-        treatLeftRotation(androidMessage.leftRotation);
-    }
-}
-
-void DroneSender_ThreadClass::treatMotorPower(double motorPower)
-{
-    m_currentMessageSent.motorPower = motorPower;
-}
-
-void DroneSender_ThreadClass::treatForwardMove(double forwardMove)
-{
-    // if > 0, forward, if < 0, backwards
-    if (forwardMove > 0)
-    {
-    }
-    else if (forwardMove < 0)
-    {
-        
-    }
-    m_currentMessageSent.forwardMove = forwardMove;
-}
-
-void DroneSender_ThreadClass::treatLeftMove(double leftMove)
-{
-    m_currentMessageSent.leftMove = leftMove;
-}
-
-void DroneSender_ThreadClass::treatLeftRotation(double leftRotation)
-{
-    m_currentMessageSent.leftRotation = leftRotation;
+    
 }

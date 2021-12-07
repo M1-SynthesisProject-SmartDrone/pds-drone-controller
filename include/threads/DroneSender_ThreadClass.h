@@ -12,7 +12,7 @@
 #include "Abstract_ThreadClass.h"
 #include "SharedMessage.h"
 
-#include "../android/message/AndroidMessageReceived.h"
+#include "../android/message/Abstract_AndroidReceivedMessage.h"
 
 #include "../network/Com_Serial.h"
 #include "../network/Com_Mavlink.h"
@@ -28,17 +28,9 @@ private:
      */
     std::shared_ptr<Drone> m_drone;
 
-    AndroidMessageReceived m_currentMessageSent;
-
     MavlinkTools m_mavlinkTools;
 
-    // PRIVATE METHODS
-    void onMessageReceived(AndroidMessageReceived androidMessage);
-    // submethods to treat a particular message
-    void treatMotorPower(double motorPower);
-    void treatForwardMove(double forwardMove);
-    void treatLeftMove(double leftMove);
-    void treatLeftRotation(double leftRotation);
+    void onMessageReceived(Abstract_AndroidReceivedMessage androidMessage);
 
 public:
     /**

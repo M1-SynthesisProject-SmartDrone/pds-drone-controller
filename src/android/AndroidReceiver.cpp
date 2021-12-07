@@ -3,8 +3,7 @@
 #include <stdexcept>
 #include <string>
 #include "../../lib/loguru/loguru.hpp"
-
-#include "../../include/android/message/Json_AndroidMessageConverter.h"
+#include "../../include/android/converter/Json_AndroidMessageConverter.h"
 
 #include <arpa/inet.h>
 #include <string.h>
@@ -27,7 +26,7 @@ void AndroidReceiver::init(uint16_t port)
     m_UDPSocket->bindPort(port);
 }
 
-AndroidMessageReceived AndroidReceiver::receiveMessage()
+Abstract_AndroidReceivedMessage AndroidReceiver::receiveMessage()
 {
     // Must be a too big buffer to work with
     char buffer[512];

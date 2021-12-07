@@ -7,13 +7,13 @@
  * @author Aldric Vitali Silvestre
  */
 
-#include "./AndroidMessageReceived.h"
+#include "../message/Abstract_AndroidReceivedMessage.h"
 #include <string>
 
 class Abstract_AndroidMessageConverter
 {
 public:
-    virtual AndroidMessageReceived convertMessageReceived(std::string message) = 0;
+    virtual Abstract_AndroidReceivedMessage convertMessageReceived(std::string message) = 0;
     // TODO more later we will have the other side function
 
 private:
