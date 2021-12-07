@@ -23,12 +23,11 @@ DroneReceiver_ThreadClass::~DroneReceiver_ThreadClass()
 {
 }
 
-
 void DroneReceiver_ThreadClass::run()
 {
     loguru::set_thread_name("drone receiver");
     LOG_F(INFO, "Start Drone receiver thread class");
-    string buffer1 = "";
+    // string buffer1 = "";
 
     while (isRunFlag()) {
         usleep(task_period);
@@ -39,11 +38,13 @@ void DroneReceiver_ThreadClass::run()
         {
             LOG_F(INFO, "Received message from px4 of id : %d ", mavlinkMessage.msgid);
 
+            // ? Add a timestamp check ?
             switch (mavlinkMessage.msgid)
             {
             case MAVLINK_MSG_ID_ALTITUDE:
                 mavlink_altitude_t altitude;
                 mavlink_msg_altitude_decode(&mavlinkMessage, &altitude);
+                updateDroneData(altitude);
                 printf("altitude_local  %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
                 break;
 
@@ -54,40 +55,27 @@ void DroneReceiver_ThreadClass::run()
                 break;
 
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-
                 mavlink_global_position_int_t global_position_int;
                 mavlink_msg_global_position_int_decode(&mavlinkMessage, &global_position_int);
-                buffer1 = "\nGPS: " + std::to_string(global_position_int.lat) + " " + std::to_string(global_position_int.lon) + " " + std::to_string(global_position_int.alt) + "\n";
-                cout << buffer1 << endl;
-
+                updateDroneData(global_position_int);
                 break;
 
             case MAVLINK_MSG_ID_SCALED_IMU:
                 mavlink_raw_imu_t scaled_imu;
                 mavlink_msg_raw_imu_decode(&mavlinkMessage, &scaled_imu);
-                buffer1 = buffer1 + " Acc: " + std::to_string(scaled_imu.xacc) + " " + std::to_string(scaled_imu.yacc) + " " + std::to_string(scaled_imu.zacc) + "\n";
-                buffer1 = buffer1 + " Gyro: " + std::to_string(scaled_imu.xgyro) + " " + std::to_string(scaled_imu.ygyro) + " " + std::to_string(scaled_imu.zgyro) + "\n";
-                buffer1 = buffer1 + " Mag: " + std::to_string(scaled_imu.xmag) + " " + std::to_string(scaled_imu.ymag) + " " + std::to_string(scaled_imu.zmag) + "\n";
-                cout << buffer1 << endl;
+                updateDroneData(scaled_imu);
+                break;
 
             case MAVLINK_MSG_ID_HIGHRES_IMU:
                 mavlink_highres_imu_t highres_imu;
-
                 mavlink_msg_highres_imu_decode(&mavlinkMessage, &highres_imu);
-
-                buffer1 = buffer1 + " Acc: " + std::to_string(highres_imu.xacc) + " " + std::to_string(highres_imu.yacc) + " " + std::to_string(highres_imu.zacc) + "\n";
-                buffer1 = buffer1 + " Gyro: " + std::to_string(highres_imu.xgyro) + " " + std::to_string(highres_imu.ygyro) + " " + std::to_string(highres_imu.zgyro) + "\n";
-                buffer1 = buffer1 + " Mag: " + std::to_string(highres_imu.xmag) + " " + std::to_string(highres_imu.ymag) + " " + std::to_string(highres_imu.zmag) + "\n";
-                buffer1 = buffer1 + " Temperature: " + std::to_string(highres_imu.temperature) + "\n\n";
-                cout << buffer1 << endl;
-
+                updateDroneData(highres_imu);
                 break;
 
             case MAVLINK_MSG_ID_BATTERY_STATUS:
                 mavlink_battery_status_t battery_status;
                 mavlink_msg_battery_status_decode(&mavlinkMessage, &battery_status);
-                printf("Battery status : %d \n", battery_status.battery_remaining);
-
+                updateDroneData(battery_status);
                 break;
             default:
                 LOG_F(INFO, "Unknown message id");
@@ -107,6 +95,7 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
     buffer = buffer + " result_param2: " + std::to_string(m_drone.get()->ack.result_param2) + "\n";
     buffer = buffer + " progress: " + std::to_string(m_drone.get()->ack.progress) + "\n";
     cout << buffer << endl;
+
     Drone *drone = m_drone.get();
     drone->ack = commandAck;
 
@@ -126,6 +115,51 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
         }
         break;
     case MAVLINK_MSG_ID_MANUAL_CONTROL:
+        if (commandAck.result != MAV_RESULT_IN_PROGRESS)
+        {
+            LOG_F(ERROR, "Manual control : receive error of type %d : result2 = %d", commandAck.result, commandAck.result_param2);
+        }
         break;
     }
+}
+
+void DroneReceiver_ThreadClass::updateDroneData(mavlink_altitude_t altitude)
+{
+    printf("Altitude : altitude_local %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
+
+    Drone *drone = m_drone.get();
+    drone->altitude = altitude;
+}
+
+void DroneReceiver_ThreadClass::updateDroneData(mavlink_global_position_int_t globalPosition)
+{
+    string buffer1 = "\nGPS: " + std::to_string(globalPosition.lat) + " " + std::to_string(globalPosition.lon) + " " + std::to_string(globalPosition.alt) + "\n";
+    cout << buffer1 << endl;
+    m_drone.get()->global_position_int = globalPosition;
+}
+
+void DroneReceiver_ThreadClass::updateDroneData(mavlink_raw_imu_t rawImu)
+{
+    // WARN : we don't store those structs, only for debugging
+    string buffer1 = "mavlink_raw_imu_t : Acc: " + std::to_string(rawImu.xacc) + " " + std::to_string(rawImu.yacc) + " " + std::to_string(rawImu.zacc) + "\n";
+    buffer1 = buffer1 + " Gyro: " + std::to_string(rawImu.xgyro) + " " + std::to_string(rawImu.ygyro) + " " + std::to_string(rawImu.zgyro) + "\n";
+    buffer1 = buffer1 + " Mag: " + std::to_string(rawImu.xmag) + " " + std::to_string(rawImu.ymag) + " " + std::to_string(rawImu.zmag) + "\n";
+    cout << buffer1 << endl;
+}
+
+void DroneReceiver_ThreadClass::updateDroneData(mavlink_highres_imu_t highresImu)
+{
+
+    string buffer1 = "highres : Acc: " + std::to_string(highresImu.xacc) + " " + std::to_string(highresImu.yacc) + " " + std::to_string(highresImu.zacc) + "\n";
+    buffer1 = buffer1 + " Gyro: " + std::to_string(highresImu.xgyro) + " " + std::to_string(highresImu.ygyro) + " " + std::to_string(highresImu.zgyro) + "\n";
+    buffer1 = buffer1 + " Mag: " + std::to_string(highresImu.xmag) + " " + std::to_string(highresImu.ymag) + " " + std::to_string(highresImu.zmag) + "\n";
+    buffer1 = buffer1 + " Temperature: " + std::to_string(highresImu.temperature) + "\n\n";
+    cout << buffer1 << endl;
+    m_drone.get()->highres_imu = highresImu;
+}
+
+void DroneReceiver_ThreadClass::updateDroneData(mavlink_battery_status_t batteryStatus)
+{
+    printf("Battery status : %d \n", batteryStatus.battery_remaining);
+    m_drone.get()->battery_status = batteryStatus;
 }

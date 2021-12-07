@@ -6,11 +6,10 @@
 
 using namespace std;
 
-AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(int task_period, int task_deadline, uint16_t udpPort, shared_ptr<Drone> drone)
+AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(int task_period, int task_deadline, uint16_t udpPort)
     : Abstract_ThreadClass(task_period, task_deadline)
 {
     m_udpPort = udpPort;
-    m_drone = drone;
 }
 
 AndroidReceiver_ThreadClass::~AndroidReceiver_ThreadClass() 

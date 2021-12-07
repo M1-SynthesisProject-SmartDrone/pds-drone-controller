@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 
     // The list of threads used by the app
     vector<Abstract_ThreadClass*> threads;
-    threads.push_back(new AndroidReceiver_ThreadClass(1000, 200, androidPort, drone));
+    threads.push_back(new AndroidReceiver_ThreadClass(1000, 200, androidPort));
     if (useDrone)
     {
         threads.push_back(new DroneSender_ThreadClass(1000, 200, drone));

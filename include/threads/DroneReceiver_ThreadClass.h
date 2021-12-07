@@ -16,8 +16,12 @@ class DroneReceiver_ThreadClass : public Abstract_ThreadClass
 private:
     std::shared_ptr<Drone> m_drone;
 
-    void updateDroneData(mavlink_altitude_t altitideData);
+    void updateDroneData(mavlink_altitude_t altitude);
     void updateDroneData(mavlink_command_ack_t commandAck);
+    void updateDroneData(mavlink_global_position_int_t globalPosition);
+    void updateDroneData(mavlink_raw_imu_t rawImu);
+    void updateDroneData(mavlink_highres_imu_t highresImu);
+    void updateDroneData(mavlink_battery_status_t batteryStatus);
 
 public:
     DroneReceiver_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone);
