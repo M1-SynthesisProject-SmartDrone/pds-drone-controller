@@ -17,27 +17,16 @@ DroneSender_ThreadClass::DroneSender_ThreadClass(int task_period, int task_deadl
 }
 
 DroneSender_ThreadClass::~DroneSender_ThreadClass()
-{
-}
+{}
 
 void DroneSender_ThreadClass::run()
 {
     loguru::set_thread_name("drone sender");
     LOG_F(INFO, "Run drone sender thread");
-    // Ask drone to arm, doesn't change anything for now
-    LOG_F(INFO, "Arm drone");
-    m_drone.get()->command_arm(1);
-
-
-    // TODO : test the new command
-    // see DroneManualCommand for infos
-    short x = 0, y = 0, z = 10, r = 0;
-    DroneManualCommand manualCommand = {x, y, z, r};
-    // m_drone.get()->manual_control(manualCommand);
 
     while (isRunFlag())
     {
-        
+
         // wait for message to come, then send it to the drone
         auto message = SharedMessage::getInstance()->pop();
         // LOG_F(INFO, "Process message : Action = %ld Value =%lf", message.action, message.value);
@@ -45,7 +34,8 @@ void DroneSender_ThreadClass::run()
         // while (m_drone.get()->motors == Drone_Motors::UNARM);
 
         // depending on the action, do something
-        try {
+        try
+        {
             onMessageReceived(message);
         }
         catch (std::exception& exception)
@@ -58,9 +48,36 @@ void DroneSender_ThreadClass::run()
     m_drone.get()->command_arm(0);
 }
 
+void DroneSender_ThreadClass::sendArmMessage(Arm_MessageReceived armMessage)
+{
+    LOG_F(INFO, "Send arming command");
+    int command = armMessage.armDrone ? 1 : 0;
+    m_drone.get()->command_arm(command);
+}
+
+void DroneSender_ThreadClass::sendManualControlMessage(Manual_MessageReceived manualControlMessage)
+{
+    
+}
+
 void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage androidMessage)
 {
+    switch (androidMessage.messageType)
+    {
+    case MESSAGE_TYPE::ARM_COMMAND:
+        Arm_MessageReceived *armMessage = static_cast<Arm_MessageReceived*>(&androidMessage);
+        sendArmMessage(*armMessage);
+        free(armMessage);
+        break;
+    case MESSAGE_TYPE::MANUAL_CONTROL:
+        Manual_MessageReceived *manualMessage = static_cast<Manual_MessageReceived*>(&androidMessage);
+        sendManualControlMessage(*manualMessage);
+        free(manualMessage);
+        break;
+    case MESSAGE_TYPE::UNKNOWN:
+    default:
+        throw runtime_error("Unknown message type");
+        break;
+    }
 
-    // TODO : if manual_control works, all below is useless and must be updated
-    
 }
