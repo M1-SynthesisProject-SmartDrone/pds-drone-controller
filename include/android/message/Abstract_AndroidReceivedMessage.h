@@ -11,7 +11,7 @@ struct Abstract_AndroidReceivedMessage : Abstract_AndroidMessage
 
     std::string toString()
     {
-        return "Received message";
+        return this->str;
     }
 };
 

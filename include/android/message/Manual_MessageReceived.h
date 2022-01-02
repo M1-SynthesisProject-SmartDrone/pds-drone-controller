@@ -24,11 +24,8 @@ struct Manual_MessageReceived : Abstract_AndroidReceivedMessage
         this->leftRotation = leftRotation;
         this->forwardMove = forwardMove;
         this->motorPower = motorPower;
-    }
 
-    std::string toString()
-    {
-        return "Manual_MessageReceived [LeftMove = " + std::to_string(this->leftMove) 
+        this->str = "Manual_MessageReceived [LeftMove = " + std::to_string(this->leftMove) 
             + ", LeftRotation = " + std::to_string(this->leftRotation)
             + ", ForwardMove = " + std::to_string(this->forwardMove)
             + ", MotorPower = " + std::to_string(this->motorPower)

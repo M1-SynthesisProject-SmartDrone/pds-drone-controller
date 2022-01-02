@@ -33,6 +33,9 @@ Abstract_AndroidReceivedMessage Json_AndroidMessageConverter::convertMessageRece
         case MESSAGE_TYPE::MANUAL_CONTROL:
             converted = tryParseManualCommand(json);
             break;
+        case MESSAGE_TYPE::TAKE_OFF:
+            converted = tryParseTakeOffCommand(json);
+            break;
         default:
             throw invalid_argument("Message type unknown");
         }
@@ -53,31 +56,21 @@ MESSAGE_TYPE Json_AndroidMessageConverter::findMessageType(simdjson::padded_stri
     simdjson::ondemand::parser parser;
     auto doc = parser.iterate(json);
 
-    if (doc.find_field("leftMove").error() == simdjson::SUCCESS)
-    {
-        std::cout << "SUCCESS" << std::endl;
-    }
-    if (doc.find_field("armDrone").error() == simdjson::SUCCESS)
-    {
-        std::cout << "YES!" << std::endl;
-    }
-
-
-    if (doc.find_field("leftMove").error() == simdjson::SUCCESS
-        && doc.find_field("leftrotation").error() == simdjson::SUCCESS
-        && doc.find_field("forwardmove").error() == simdjson::SUCCESS
-        && doc.find_field("motorpower").error() == simdjson::SUCCESS
+    if (doc["leftmove"].error() == simdjson::SUCCESS
+        && doc["leftrotation"].error() == simdjson::SUCCESS
+        && doc["forwardmove"].error() == simdjson::SUCCESS
+        && doc["motorpower"].error() == simdjson::SUCCESS
         )
     {
         return MESSAGE_TYPE::MANUAL_CONTROL;
     }
 
-    if (doc.find_field("armDrone").error() == simdjson::SUCCESS)
+    if (doc["armDrone"].error() == simdjson::SUCCESS)
     {
         return MESSAGE_TYPE::ARM_COMMAND;
     }
 
-    if (doc.find_field("takeOff").error() == simdjson::SUCCESS)
+    if (doc["takeoff"].error() == simdjson::SUCCESS)
     {
         return MESSAGE_TYPE::TAKE_OFF;
     }
@@ -108,5 +101,16 @@ Arm_MessageReceived Json_AndroidMessageConverter::tryParseArmCommand(simdjson::p
     bool armDrone = doc["armDrone"].get_bool();
     return Arm_MessageReceived{
         armDrone
+    };
+}
+
+TakeOff_MessageReceived Json_AndroidMessageConverter::tryParseTakeOffCommand(simdjson::padded_string& json)
+{
+    simdjson::ondemand::parser parser;
+    auto doc = parser.iterate(json);
+    if (doc["takeoff"].error() == simdjson::SUCCESS) {};
+    bool takeOff = doc["takeoff"].get_bool();
+    return TakeOff_MessageReceived{
+        takeOff
     };
 }

@@ -13,6 +13,7 @@
 #include "Abstract_AndroidMessageConverter.h"
 #include "../message/Manual_MessageReceived.h"
 #include "../message/Arm_MessageReceived.h"
+#include "../message/TakeOff_MessageReceived.h"
 #include "../message/MessageType.h"
 
 class Json_AndroidMessageConverter : public Abstract_AndroidMessageConverter
@@ -28,6 +29,7 @@ private:
 
     Manual_MessageReceived tryParseManualCommand(simdjson::padded_string &json);
     Arm_MessageReceived tryParseArmCommand(simdjson::padded_string &json);
+    TakeOff_MessageReceived tryParseTakeOffCommand(simdjson::padded_string &json);
 };
 
 

@@ -9,6 +9,7 @@
  */
 struct Abstract_AndroidMessage{
     MESSAGE_TYPE messageType;
+    std::string str;
     
     virtual std::string toString() = 0;
 };
