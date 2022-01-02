@@ -15,6 +15,7 @@
 #include "../android/message/Abstract_AndroidReceivedMessage.h"
 #include "../android/message/Arm_MessageReceived.h"
 #include "../android/message/Manual_MessageReceived.h"
+#include "../android/message/TakeOff_MessageReceived.h"
 
 #include "../network/Com_Serial.h"
 #include "../network/Com_Mavlink.h"
@@ -35,6 +36,7 @@ private:
     void onMessageReceived(Abstract_AndroidReceivedMessage androidMessage);
     void sendArmMessage(Arm_MessageReceived armMessage);
     void sendManualControlMessage(Manual_MessageReceived manualControlMessage);
+    void sendTakeOffMessage(TakeOff_MessageReceived takeOffMessage);
 
 public:
     /**

@@ -39,4 +39,13 @@
     Déjà on va mettre le thread Android dans une classe à part
         ==> On utilise la classe de base "Abstract_ThreadClass" pour éviter de tout réécrire (merci Sylvain !)
 
-    
+
+==== MULTIPLE MESSAGES ====
+    On a plusieurs messages qui vont devoir être reçus 
+    Le plus simple est donc d'avoir un objet de type :
+    {
+        "type": "ARM",
+        "content": {
+            ...
+        }
+    }

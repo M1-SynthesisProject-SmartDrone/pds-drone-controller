@@ -45,11 +45,11 @@ void DroneSender_ThreadClass::run()
 
     }
     LOG_F(INFO, "End of thread");
-    m_drone.get()->command_arm(0);
 }
 
 void DroneSender_ThreadClass::sendArmMessage(Arm_MessageReceived armMessage)
 {
+    // we probably want to make some verfications here
     LOG_F(INFO, "Send arming command");
     int command = armMessage.armDrone ? 1 : 0;
     m_drone.get()->command_arm(command);
@@ -57,7 +57,32 @@ void DroneSender_ThreadClass::sendArmMessage(Arm_MessageReceived armMessage)
 
 void DroneSender_ThreadClass::sendManualControlMessage(Manual_MessageReceived manualControlMessage)
 {
-    
+    // Don't log here, we will have a LOT of commands here
+    m_drone.get()->command_directControl(
+        // -1000 = back, 1000 = forward
+        manualControlMessage.forwardMove * 1000,
+        // -1000 = left, 1000 = right
+        manualControlMessage.leftMove * -1000,
+        // -1000 = min thrust, 1000 = max thrust
+        manualControlMessage.motorPower * 1000,
+        // -1000 = clockwise, 1000 = counter-clockwise
+        manualControlMessage.leftRotation * 1000
+    );
+}
+
+void DroneSender_ThreadClass::sendTakeOffMessage(TakeOff_MessageReceived takeOffMessage)
+{
+    // we probably want to check some conditions here (grounded, etc.)
+    if (takeOffMessage.takeOff)
+    {
+        LOG_F(INFO, "Send Take off command");
+        m_drone.get()->take_off();
+    }
+    else
+    {
+        LOG_F(INFO, "Send landing command");
+        m_drone.get()->landing();
+    }
 }
 
 void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage androidMessage)
@@ -65,15 +90,28 @@ void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage 
     switch (androidMessage.messageType)
     {
     case MESSAGE_TYPE::ARM_COMMAND:
-        Arm_MessageReceived *armMessage = static_cast<Arm_MessageReceived*>(&androidMessage);
+    // * Brackets are made to avoid cross initialization error (var defined in all scopes)
+    // see : https://stackoverflow.com/questions/11578936/getting-a-bunch-of-crosses-initialization-error#answer-11578973
+    {
+        Arm_MessageReceived* armMessage = static_cast<Arm_MessageReceived*>(&androidMessage);
         sendArmMessage(*armMessage);
-        free(armMessage);
-        break;
+        free(armMessage); // can it break ?
+    }
+    break;
     case MESSAGE_TYPE::MANUAL_CONTROL:
-        Manual_MessageReceived *manualMessage = static_cast<Manual_MessageReceived*>(&androidMessage);
+    {
+        Manual_MessageReceived* manualMessage = static_cast<Manual_MessageReceived*>(&androidMessage);
         sendManualControlMessage(*manualMessage);
         free(manualMessage);
-        break;
+    }
+    break;
+    case MESSAGE_TYPE::TAKE_OFF:
+    {
+        TakeOff_MessageReceived* takeOffMessage = static_cast<TakeOff_MessageReceived*>(&androidMessage);
+        sendTakeOffMessage(*takeOffMessage);
+        free(takeOffMessage);
+    }
+    break;
     case MESSAGE_TYPE::UNKNOWN:
     default:
         throw runtime_error("Unknown message type");

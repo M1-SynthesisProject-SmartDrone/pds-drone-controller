@@ -6,6 +6,8 @@
 /**
  * Contains infos for manual control.
  * 
+ * ex : 
+ * 
  * @author Aldric Vitali Silvestre
  */
 struct Manual_MessageReceived : Abstract_AndroidReceivedMessage
