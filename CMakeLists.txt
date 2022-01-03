@@ -71,13 +71,13 @@ set(LOGURU_LIB -I/lib/loguru)
 include_directories(./lib/loguru)
 
 message("- Checking : simdjson")
-if(EXISTS ${CMAKE_SOURCE_DIR}/lib/simdjson)
+if(EXISTS ${CMAKE_SOURCE_DIR}/lib/rapidjson)
    message("-> succes " )
 else()
-   message("Fail: You must add simdjson files in lib folder")
+   message("Fail: You must add rapidjson files in lib folder")
 endif()
-set(SIMDJSON_LIB -I/lib/simdjson)
-include_directories(./lib/simdjson)
+set(RAPIDJSON_LIB -I/lib/rapidjson)
+include_directories(./lib/rapidjson)
 
 message("- Checking : Blc channels")
 find_package(blc_channel REQUIRED)
@@ -100,7 +100,7 @@ find_package(Threads)
 
 link_libraries(
     ${CXXOPTS_LIB}
-    ${SIMDJSON_LIB}
+    ${RAPIDJSON_LIB}
     ${BL_LIBRARIES} 
     ${MAVLINK_LIB}
     ${LOGURU_LIB}
@@ -123,7 +123,6 @@ add_executable(
     SmartDroneController
 
     # libraries to compile
-    lib/simdjson/simdjson.cpp
     lib/loguru/loguru.cpp
     lib/loguru/loguru.hpp
 
