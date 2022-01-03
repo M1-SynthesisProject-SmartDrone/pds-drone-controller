@@ -154,10 +154,14 @@ add_executable(
     # Android related files
     include/android/AndroidReceiver.h
     src/android/AndroidReceiver.cpp
-    include/android/message/Abstract_AndroidMessageConverter.h
-    include/android/message/AndroidMessageReceived.h
-    include/android/message/Json_AndroidMessageConverter.h
-    src/android/message/Json_AndroidMessageConverter.cpp
+    include/android/converter/Abstract_AndroidMessageConverter.h
+    include/android/converter/Json_AndroidMessageConverter.h
+    src/android/converter/Json_AndroidMessageConverter.cpp
+    include/android/message/Abstract_AndroidMessage.h
+    include/android/message/Abstract_AndroidReceivedMessage.h
+    include/android/message/Arm_MessageReceived.h
+    include/android/message/Manual_MessageReceived.h
+    include/android/message/MessageType.h
 
     # Threads
     include/threads/Abstract_ThreadClass.h

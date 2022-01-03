@@ -30,7 +30,7 @@ bool SharedMessage::isEmpty()
     return m_isMessageSent;
 }
 
-void SharedMessage::add(AndroidMessageReceived message)
+void SharedMessage::add(Abstract_AndroidReceivedMessage message)
 {
     unique_lock<mutex> lock(m_lock);
     m_lastMessage = message;
@@ -39,7 +39,7 @@ void SharedMessage::add(AndroidMessageReceived message)
     m_condition_variable.notify_all();
 }
 
-AndroidMessageReceived SharedMessage::pop()
+Abstract_AndroidReceivedMessage SharedMessage::pop()
 {
     unique_lock<mutex> lock(m_lock);
     // Make the thread wait until we have one message 

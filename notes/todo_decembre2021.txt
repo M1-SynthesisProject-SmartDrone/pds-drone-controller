@@ -1,0 +1,9 @@
+ 
+ 
+ - Implem le controle du drone ==> remplir les fonctions d'envoi de messages dans DroneSender
+ - Implem AndroidSender
+    - Il nous faut une autre classe de messages partagées 
+        --> Contient le dernier message par type (arm, position etc.)
+        --> DroneReceiver va devoir remplir cette file
+    - Créer des AndroidSendedMessage
+    - Implem la convertion dans AndroidMessageConverter

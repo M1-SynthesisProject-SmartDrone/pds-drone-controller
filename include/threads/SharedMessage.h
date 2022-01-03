@@ -6,7 +6,7 @@
  * 
  * @author Aldric Vitali Silvestre
  */
-#include "../android/message/AndroidMessageReceived.h"
+#include "../android/message/Abstract_AndroidReceivedMessage.h"
 
 #include <queue>
 #include <condition_variable>
@@ -18,7 +18,7 @@ private:
     SharedMessage();
     ~SharedMessage();
 
-    AndroidMessageReceived m_lastMessage;
+    Abstract_AndroidReceivedMessage m_lastMessage;
     bool m_isMessageSent = false;
     std::mutex m_lock;
     std::condition_variable m_condition_variable;
@@ -28,8 +28,8 @@ private:
 public:
     static SharedMessage* getInstance(); 
 
-    AndroidMessageReceived pop();
-    void add(AndroidMessageReceived message);
+    Abstract_AndroidReceivedMessage pop();
+    void add(Abstract_AndroidReceivedMessage message);
 };
 
 #endif // __SHAREDMESSAGELIST_H__

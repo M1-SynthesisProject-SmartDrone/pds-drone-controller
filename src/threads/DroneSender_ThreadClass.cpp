@@ -14,34 +14,19 @@ DroneSender_ThreadClass::DroneSender_ThreadClass(int task_period, int task_deadl
     : Abstract_ThreadClass(task_period, task_deadline)
 {
     m_drone = drone;
-    m_currentMessageSent.forwardMove = 0;
-    m_currentMessageSent.leftMove = 0;
-    m_currentMessageSent.leftRotation = 0;
-    m_currentMessageSent.motorPower = 0;
 }
 
 DroneSender_ThreadClass::~DroneSender_ThreadClass()
-{
-}
+{}
 
 void DroneSender_ThreadClass::run()
 {
     loguru::set_thread_name("drone sender");
     LOG_F(INFO, "Run drone sender thread");
-    // Ask drone to arm, doesn't change anything for now
-    LOG_F(INFO, "Arm drone");
-    m_drone.get()->command_arm(1);
-
-
-    // TODO : test the new command
-    // see DroneManualCommand for infos
-    short x = 0, y = 0, z = 10, r = 0;
-    DroneManualCommand manualCommand = {x, y, z, r};
-    // m_drone.get()->manual_control(manualCommand);
 
     while (isRunFlag())
     {
-        
+
         // wait for message to come, then send it to the drone
         auto message = SharedMessage::getInstance()->pop();
         // LOG_F(INFO, "Process message : Action = %ld Value =%lf", message.action, message.value);
@@ -49,7 +34,8 @@ void DroneSender_ThreadClass::run()
         // while (m_drone.get()->motors == Drone_Motors::UNARM);
 
         // depending on the action, do something
-        try {
+        try
+        {
             onMessageReceived(message);
         }
         catch (std::exception& exception)
@@ -59,58 +45,77 @@ void DroneSender_ThreadClass::run()
 
     }
     LOG_F(INFO, "End of thread");
-    m_drone.get()->command_arm(0);
 }
 
-void DroneSender_ThreadClass::onMessageReceived(AndroidMessageReceived androidMessage)
+void DroneSender_ThreadClass::sendArmMessage(Arm_MessageReceived armMessage)
 {
+    // we probably want to make some verfications here
+    LOG_F(INFO, "Send arming command");
+    int command = armMessage.armDrone ? 1 : 0;
+    m_drone.get()->command_arm(command);
+}
 
-    // TODO : if manual_control works, all below is useless and must be updated
+void DroneSender_ThreadClass::sendManualControlMessage(Manual_MessageReceived manualControlMessage)
+{
+    // Don't log here, we will have a LOT of commands here
+    m_drone.get()->command_directControl(
+        // -1000 = back, 1000 = forward
+        manualControlMessage.forwardMove * 1000,
+        // -1000 = left, 1000 = right
+        manualControlMessage.leftMove * -1000,
+        // -1000 = min thrust, 1000 = max thrust
+        manualControlMessage.motorPower * 1000,
+        // -1000 = clockwise, 1000 = counter-clockwise
+        manualControlMessage.leftRotation * 1000
+    );
+}
 
-    // We have multiple command values at once, we want to update the most important first
-    // We will compare one by one and send an appropriate command
-    if (m_currentMessageSent.motorPower != androidMessage.motorPower)
+void DroneSender_ThreadClass::sendTakeOffMessage(TakeOff_MessageReceived takeOffMessage)
+{
+    // we probably want to check some conditions here (grounded, etc.)
+    if (takeOffMessage.takeOff)
     {
-        treatMotorPower(androidMessage.motorPower);
+        LOG_F(INFO, "Send Take off command");
+        m_drone.get()->take_off();
     }
-    else if (m_currentMessageSent.forwardMove != androidMessage.forwardMove)
+    else
     {
-        treatForwardMove(androidMessage.forwardMove);
-    }
-    else if (m_currentMessageSent.leftMove != androidMessage.leftMove)
-    {
-        treatLeftMove(androidMessage.leftMove);
-    }
-    else if (m_currentMessageSent.leftRotation != androidMessage.leftRotation)
-    {
-        treatLeftRotation(androidMessage.leftRotation);
+        LOG_F(INFO, "Send landing command");
+        m_drone.get()->landing();
     }
 }
 
-void DroneSender_ThreadClass::treatMotorPower(double motorPower)
+void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage androidMessage)
 {
-    m_currentMessageSent.motorPower = motorPower;
-}
-
-void DroneSender_ThreadClass::treatForwardMove(double forwardMove)
-{
-    // if > 0, forward, if < 0, backwards
-    if (forwardMove > 0)
+    switch (androidMessage.messageType)
     {
-    }
-    else if (forwardMove < 0)
+    case MESSAGE_TYPE::ARM_COMMAND:
+    // * Brackets are made to avoid cross initialization error (var defined in all scopes)
+    // see : https://stackoverflow.com/questions/11578936/getting-a-bunch-of-crosses-initialization-error#answer-11578973
     {
-        
+        Arm_MessageReceived* armMessage = static_cast<Arm_MessageReceived*>(&androidMessage);
+        sendArmMessage(*armMessage);
+        free(armMessage); // can it break ?
     }
-    m_currentMessageSent.forwardMove = forwardMove;
-}
+    break;
+    case MESSAGE_TYPE::MANUAL_CONTROL:
+    {
+        Manual_MessageReceived* manualMessage = static_cast<Manual_MessageReceived*>(&androidMessage);
+        sendManualControlMessage(*manualMessage);
+        free(manualMessage);
+    }
+    break;
+    case MESSAGE_TYPE::TAKE_OFF:
+    {
+        TakeOff_MessageReceived* takeOffMessage = static_cast<TakeOff_MessageReceived*>(&androidMessage);
+        sendTakeOffMessage(*takeOffMessage);
+        free(takeOffMessage);
+    }
+    break;
+    case MESSAGE_TYPE::UNKNOWN:
+    default:
+        throw runtime_error("Unknown message type");
+        break;
+    }
 
-void DroneSender_ThreadClass::treatLeftMove(double leftMove)
-{
-    m_currentMessageSent.leftMove = leftMove;
-}
-
-void DroneSender_ThreadClass::treatLeftRotation(double leftRotation)
-{
-    m_currentMessageSent.leftRotation = leftRotation;
 }

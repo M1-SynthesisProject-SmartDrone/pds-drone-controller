@@ -115,11 +115,16 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
         }
         break;
     case MAVLINK_MSG_ID_MANUAL_CONTROL:
-        if (commandAck.result != MAV_RESULT_IN_PROGRESS)
+        if (commandAck.result != MAV_RESULT_IN_PROGRESS && commandAck.result != MAV_RESULT_ACCEPTED)
         {
             LOG_F(ERROR, "Manual control : receive error of type %d : result2 = %d", commandAck.result, commandAck.result_param2);
         }
         break;
+    // case MAV_CMD_NAV_TAKEOFF:
+    //     if (commandAck.result == MAV_RESULT_ACCEPTED)
+    //     {
+    //         // We could update the drone state, if have one
+    //     }
     }
 }
 
