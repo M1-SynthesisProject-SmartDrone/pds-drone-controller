@@ -6,6 +6,7 @@
 
 #include <stdexcept>
 #include <algorithm>
+#include <string>
 
 using namespace std;
 
@@ -17,24 +18,28 @@ Json_AndroidMessageConverter::~Json_AndroidMessageConverter()
 
 Abstract_AndroidReceivedMessage Json_AndroidMessageConverter::convertMessageReceived(std::string message)
 {
-    simdjson::ondemand::parser parser;
-    auto json = simdjson::padded_string(message);
+    rapidjson::Document document;
+    document.Parse<rapidjson::kParseStopWhenDoneFlag>(message.c_str());
 
-    MESSAGE_TYPE messageType = findMessageType(json);
+    MESSAGE_TYPE messageType = findMessageType(document);
 
     Abstract_AndroidReceivedMessage converted;
     try
     {
+        if (!document["content"].IsObject()) {
+            throw invalid_argument("No content object found");
+        }
+        rapidjson::GenericObject<false, rapidjson::Value> content = document["content"].GetObject();
         switch (messageType)
         {
         case MESSAGE_TYPE::ARM_COMMAND:
-            converted = tryParseArmCommand(json);
+            converted = tryParseArmCommand(content);
             break;
         case MESSAGE_TYPE::MANUAL_CONTROL:
-            converted = tryParseManualCommand(json);
+            converted = tryParseManualCommand(content);
             break;
         case MESSAGE_TYPE::TAKE_OFF:
-            converted = tryParseTakeOffCommand(json);
+            converted = tryParseTakeOffCommand(content);
             break;
         default:
             throw invalid_argument("Message type unknown");
@@ -51,41 +56,34 @@ Abstract_AndroidReceivedMessage Json_AndroidMessageConverter::convertMessageRece
     return converted;
 }
 
-MESSAGE_TYPE Json_AndroidMessageConverter::findMessageType(simdjson::padded_string& json)
+MESSAGE_TYPE Json_AndroidMessageConverter::findMessageType(rapidjson::Document& doc)
 {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-
-    if (doc["leftmove"].error() == simdjson::SUCCESS
-        && doc["leftrotation"].error() == simdjson::SUCCESS
-        && doc["forwardmove"].error() == simdjson::SUCCESS
-        && doc["motorpower"].error() == simdjson::SUCCESS
-        )
+    if (doc.HasMember("type"))
     {
-        return MESSAGE_TYPE::MANUAL_CONTROL;
+        const char* type = doc["type"].GetString();
+        // if comparison slow, we may use hases here
+        if (strcmp(type, "ARM") == 0)
+        {
+            return MESSAGE_TYPE::ARM_COMMAND;
+        }
+        else if (strcmp(type, "TAKEOFF") == 0)
+        {
+            return MESSAGE_TYPE::TAKE_OFF;
+        }
+        else if (strcmp(type, "MANUAL_CONTROL") == 0)
+        {
+            return MESSAGE_TYPE::MANUAL_CONTROL;
+        }
     }
-
-    if (doc["armDrone"].error() == simdjson::SUCCESS)
-    {
-        return MESSAGE_TYPE::ARM_COMMAND;
-    }
-
-    if (doc["takeoff"].error() == simdjson::SUCCESS)
-    {
-        return MESSAGE_TYPE::TAKE_OFF;
-    }
-
     return MESSAGE_TYPE::UNKNOWN;
 }
 
-Manual_MessageReceived Json_AndroidMessageConverter::tryParseManualCommand(simdjson::padded_string& json)
+Manual_MessageReceived Json_AndroidMessageConverter::tryParseManualCommand(rapidjson::GenericObject<false, rapidjson::Value> &obj)
 {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-    double leftMove = doc["leftmove"].get_double_in_string();
-    double leftRotation = doc["leftrotation"].get_double_in_string();
-    double forwardMove = doc["forwardmove"].get_double_in_string();
-    double motorPower = doc["motorpower"].get_double_in_string();
+    double leftMove = obj["leftmove"].GetDouble();
+    double leftRotation = obj["leftrotation"].GetDouble();
+    double forwardMove = obj["forwardmove"].GetDouble();
+    double motorPower = obj["motorpower"].GetDouble();
     return Manual_MessageReceived{
         leftMove,
         leftRotation,
@@ -94,22 +92,17 @@ Manual_MessageReceived Json_AndroidMessageConverter::tryParseManualCommand(simdj
     };
 }
 
-Arm_MessageReceived Json_AndroidMessageConverter::tryParseArmCommand(simdjson::padded_string& json)
+Arm_MessageReceived Json_AndroidMessageConverter::tryParseArmCommand(rapidjson::GenericObject<false, rapidjson::Value> &obj)
 {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-    bool armDrone = doc["armDrone"].get_bool();
+    bool armDrone = obj["armDrone"].GetBool();
     return Arm_MessageReceived{
         armDrone
     };
 }
 
-TakeOff_MessageReceived Json_AndroidMessageConverter::tryParseTakeOffCommand(simdjson::padded_string& json)
+TakeOff_MessageReceived Json_AndroidMessageConverter::tryParseTakeOffCommand(rapidjson::GenericObject<false, rapidjson::Value> &obj)
 {
-    simdjson::ondemand::parser parser;
-    auto doc = parser.iterate(json);
-    if (doc["takeoff"].error() == simdjson::SUCCESS) {};
-    bool takeOff = doc["takeoff"].get_bool();
+    bool takeOff = obj["takeoff"].GetBool();
     return TakeOff_MessageReceived{
         takeOff
     };
