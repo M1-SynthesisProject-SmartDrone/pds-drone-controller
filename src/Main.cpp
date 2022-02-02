@@ -6,16 +6,16 @@
 #include <stdlib.h>
 #include <sstream>
 
-#include "../lib/loguru/loguru.hpp"
-#include "cxxopts/cxxopts.hpp"
+#include <loguru/loguru.hpp>
+#include <cxxopts/cxxopts.hpp>
 
-#include "../include/threads/Abstract_ThreadClass.h"
-#include "../include/threads/AndroidReceiver_ThreadClass.h"
-#include "../include/threads/DroneSender_ThreadClass.h"
-#include "../include/threads/DroneReceiver_ThreadClass.h"
-#include "../include/threads/SharedMessage.h"
-#include "../include/network/Com_Serial.h"
-#include "../include/drone/Data_Drone.h"
+#include "threads/Abstract_ThreadClass.h"
+#include "threads/AndroidReceiver_ThreadClass.h"
+#include "threads/DroneSender_ThreadClass.h"
+#include "threads/DroneReceiver_ThreadClass.h"
+#include "threads/SharedMessage.h"
+#include "network/Com_Serial.h"
+#include "drone/Data_Drone.h"
 
 using namespace std;
 

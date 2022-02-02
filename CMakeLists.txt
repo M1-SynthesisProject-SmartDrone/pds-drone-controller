@@ -112,7 +112,9 @@ link_libraries(
     panel 
 )
 
+add_subdirectory(lib)
 include_directories(lib)
+include_directories(include)
 
 
 ######################################################################################################
@@ -121,10 +123,10 @@ include_directories(lib)
 
 message("\n%% APPLICATION GENERATION")
 
-add_subdirectory(lib)
+
 
 file(GLOB_RECURSE drone_SRC 
-    "lib/**"
+    "lib/*.h"
     "include/*.h"
      "src/*.cpp"
 )
@@ -132,8 +134,9 @@ file(GLOB_RECURSE drone_SRC
 # %% App files
 add_executable(${APP_NAME} ${drone_SRC})
 
-target_link_libraries(${APP_NAME} 
+target_link_libraries(${APP_NAME} PUBLIC
     cxxopts 
     mavlink
     loguru
+    rapidjson
 )

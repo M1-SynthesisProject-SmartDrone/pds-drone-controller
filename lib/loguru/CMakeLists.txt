@@ -1,1 +1,1 @@
-add_library(loguru INTERFACE)
+add_library(loguru loguru.cpp loguru.hpp)
