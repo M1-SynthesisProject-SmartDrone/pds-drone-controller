@@ -11,7 +11,7 @@
 #define DRONE_H
 
 
-#include "mavlink/common/mavlink.h"
+#include <mavlink/common/mavlink.h>
 
 #include <iostream>
 #include <string>
@@ -23,10 +23,10 @@
 #include <math.h>
 #include <sys/time.h>
 
-#include "../network/Com_Serial.h"
-#include "../network/Com_Wifi.h"
+#include "network/Com_Serial.h"
+#include "network/Com_Wifi.h"
 
-#include "../drone/DroneManualCommand.h"
+#include "drone/DroneManualCommand.h"
 
  //#include "common/mavlink_msg_compassmot_status.h"
 

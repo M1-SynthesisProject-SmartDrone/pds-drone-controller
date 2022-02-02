@@ -23,7 +23,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 
-#include "../../lib/mavlink/common/mavlink.h"
+#include <mavlink/common/mavlink.h>
 
 #define BUFFER_LENGTH 2041
 

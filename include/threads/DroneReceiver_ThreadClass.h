@@ -9,7 +9,7 @@
  */
 
 #include "./Abstract_ThreadClass.h"
-#include "../drone/Data_Drone.h"
+#include "drone/Data_Drone.h"
 
 class DroneReceiver_ThreadClass : public Abstract_ThreadClass
 {

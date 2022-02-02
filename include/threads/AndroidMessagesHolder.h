@@ -4,7 +4,7 @@
 #include <memory>
 #include <condition_variable>
 #include <mutex>
-#include "../../include/android/message/Abstract_AndroidReceivedMessage.h"
+#include "android/message/Abstract_AndroidReceivedMessage.h"
 
 /**
  * Thread-safe class used to make the bridge between the android application and the ground station.

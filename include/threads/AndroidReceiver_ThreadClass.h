@@ -12,10 +12,10 @@
 #include "AndroidMessagesHolder.h"
 #include <memory>
 
-#include "../drone/Data_Drone.h"
-#include "../network/UDPSocket.h"
-#include "../../include/android/message/Abstract_AndroidReceivedMessage.h"
-#include "../../include/android/converter/Json_AndroidMessageConverter.h"
+#include "drone/Data_Drone.h"
+#include "network/UDPSocket.h"
+#include "android/message/Abstract_AndroidReceivedMessage.h"
+#include "android/converter/Json_AndroidMessageConverter.h"
 
 class AndroidReceiver_ThreadClass : public Abstract_ThreadClass
 {

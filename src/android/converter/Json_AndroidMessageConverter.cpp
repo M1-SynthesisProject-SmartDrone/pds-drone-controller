@@ -1,12 +1,4 @@
-#include "../../../include/android/converter/Json_AndroidMessageConverter.h"
-
-#include "../../../lib/loguru/loguru.hpp"
-
-#include "../../../include/android/message/Manual_MessageReceived.h"
-
-#include <stdexcept>
-#include <algorithm>
-#include <string>
+#include "android/converter/Json_AndroidMessageConverter.h"
 
 using namespace std;
 

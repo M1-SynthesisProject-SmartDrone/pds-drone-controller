@@ -25,7 +25,7 @@
 #define SERIAL_PORT_CLOSED 0
 #define SERIAL_PORT_ERROR -1
 
-#include "../../lib/mavlink/common/mavlink.h"
+#include <mavlink/common/mavlink.h>
 
 #include <cstdlib>
 #include <stdio.h>  

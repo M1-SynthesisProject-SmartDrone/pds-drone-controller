@@ -23,7 +23,7 @@
 
 //#include <loguru.hpp>
 
-#include "../../lib/mavlink/common/mavlink.h"
+#include <mavlink/common/mavlink.h>
 
 #include "../Constants.h"
 #include "Com_Serial.h"

@@ -12,16 +12,16 @@
 #include "Abstract_ThreadClass.h"
 #include "SharedMessage.h"
 
-#include "../android/message/Abstract_AndroidReceivedMessage.h"
-#include "../android/message/Arm_MessageReceived.h"
-#include "../android/message/Manual_MessageReceived.h"
-#include "../android/message/TakeOff_MessageReceived.h"
+#include "android/message/Abstract_AndroidReceivedMessage.h"
+#include "android/message/Arm_MessageReceived.h"
+#include "android/message/Manual_MessageReceived.h"
+#include "android/message/TakeOff_MessageReceived.h"
 
-#include "../network/Com_Serial.h"
-#include "../network/Com_Mavlink.h"
+#include "network/Com_Serial.h"
+#include "network/Com_Mavlink.h"
 
-#include "../drone/Data_Drone.h"
-#include "../drone/DroneManualCommand.h"
+#include "drone/Data_Drone.h"
+#include "drone/DroneManualCommand.h"
 
 #include "AndroidMessagesHolder.h"
 

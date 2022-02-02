@@ -11,7 +11,7 @@
 #include "Abstract_ThreadClass.h"
 #include "SharedMessage.h"
 
-#include "../drone/Data_Drone.h"
+#include "drone/Data_Drone.h"
 
 class AndroidReceiver_ThreadClass : public Abstract_ThreadClass
 {
