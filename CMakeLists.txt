@@ -118,59 +118,11 @@ link_libraries(
 
 message("\n%% APPLICATION GENERATION")
 
-# %% App files
-add_executable(
-    SmartDroneController
-
-    # libraries to compile
-    lib/loguru/loguru.cpp
-    lib/loguru/loguru.hpp
-
-    # entry point
-    src/Main.cpp
-
-    include/Constants.h
-    include/global_variables.h
-
-    # Network related files
-    include/network/UDPSocket.h
-    src/network/UDPSocket.cpp
-    include/network/Com_Mavlink.h
-    # include/network/Com_SerialPort.h
-    src/network/Com_Mavlink.cpp
-    # src/network/Com_SerialPort.cpp
-    include/network/Com_Serial.h
-    include/network/Com_Wifi.h
-    src/network/Com_Serial.cpp
-
-
-    # Drone related files
-    include/drone/Data_Drone.h
-    include/drone/DroneManualCommand.h
-    src/drone/Data_Drone.cpp
-    
-
-    # Android related files
-    include/android/AndroidReceiver.h
-    src/android/AndroidReceiver.cpp
-    include/android/converter/Abstract_AndroidMessageConverter.h
-    include/android/converter/Json_AndroidMessageConverter.h
-    src/android/converter/Json_AndroidMessageConverter.cpp
-    include/android/message/Abstract_AndroidMessage.h
-    include/android/message/Abstract_AndroidReceivedMessage.h
-    include/android/message/Arm_MessageReceived.h
-    include/android/message/Manual_MessageReceived.h
-    include/android/message/MessageType.h
-
-    # Threads
-    include/threads/Abstract_ThreadClass.h
-    include/threads/AndroidReceiver_ThreadClass.h
-    include/threads/DroneSender_ThreadClass.h
-    include/threads/DroneReceiver_ThreadClass.h
-    include/threads/SharedMessage.h
-    src/threads/Abstract_ThreadClass.cpp
-    src/threads/AndroidReceiver_ThreadClass.cpp
-    src/threads/DroneSender_ThreadClass.cpp
-    src/threads/DroneReceiver_ThreadClass.cpp
-    src/threads/SharedMessage.cpp
+file(GLOB_RECURSE drone_SRC 
+    "lib/**"
+    "include/*.h"
+     "src/*.cpp"
 )
+
+# %% App files
+add_executable(SmartDroneController ${drone_SRC})
