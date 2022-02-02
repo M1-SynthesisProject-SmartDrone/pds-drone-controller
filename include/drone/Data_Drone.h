@@ -11,7 +11,7 @@
 #define DRONE_H
 
 
-#include "../../lib/mavlink/common/mavlink.h"
+#include "mavlink/common/mavlink.h"
 
 #include <iostream>
 #include <string>
