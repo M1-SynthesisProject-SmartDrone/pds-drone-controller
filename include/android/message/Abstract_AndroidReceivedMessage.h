@@ -9,9 +9,9 @@
 struct Abstract_AndroidReceivedMessage : Abstract_AndroidMessage
 {
 
-    std::string toString()
+    virtual std::string toString()
     {
-        return this->str;
+        return "Abstract_AndroidReceivedMessage";
     }
 };
 

@@ -16,14 +16,14 @@ Json_AndroidMessageConverter::Json_AndroidMessageConverter()
 Json_AndroidMessageConverter::~Json_AndroidMessageConverter()
 {}
 
-Abstract_AndroidReceivedMessage Json_AndroidMessageConverter::convertMessageReceived(std::string message)
+Abstract_AndroidReceivedMessage* Json_AndroidMessageConverter::convertMessageReceived(string message)
 {
     rapidjson::Document document;
     document.Parse<rapidjson::kParseStopWhenDoneFlag>(message.c_str());
 
     MESSAGE_TYPE messageType = findMessageType(document);
 
-    Abstract_AndroidReceivedMessage converted;
+    Abstract_AndroidReceivedMessage* converted;
     try
     {
         if (!document["content"].IsObject()) {
@@ -78,13 +78,13 @@ MESSAGE_TYPE Json_AndroidMessageConverter::findMessageType(rapidjson::Document& 
     return MESSAGE_TYPE::UNKNOWN;
 }
 
-Manual_MessageReceived Json_AndroidMessageConverter::tryParseManualCommand(rapidjson::GenericObject<false, rapidjson::Value> &obj)
+Manual_MessageReceived* Json_AndroidMessageConverter::tryParseManualCommand(rapidjson::GenericObject<false, rapidjson::Value> &obj)
 {
     double leftMove = obj["leftmove"].GetDouble();
     double leftRotation = obj["leftrotation"].GetDouble();
     double forwardMove = obj["forwardmove"].GetDouble();
     double motorPower = obj["motorpower"].GetDouble();
-    return Manual_MessageReceived{
+    return new Manual_MessageReceived{
         leftMove,
         leftRotation,
         forwardMove,
@@ -92,18 +92,18 @@ Manual_MessageReceived Json_AndroidMessageConverter::tryParseManualCommand(rapid
     };
 }
 
-Arm_MessageReceived Json_AndroidMessageConverter::tryParseArmCommand(rapidjson::GenericObject<false, rapidjson::Value> &obj)
+Arm_MessageReceived* Json_AndroidMessageConverter::tryParseArmCommand(rapidjson::GenericObject<false, rapidjson::Value> &obj)
 {
     bool armDrone = obj["armDrone"].GetBool();
-    return Arm_MessageReceived{
+    return new Arm_MessageReceived{
         armDrone
     };
 }
 
-TakeOff_MessageReceived Json_AndroidMessageConverter::tryParseTakeOffCommand(rapidjson::GenericObject<false, rapidjson::Value> &obj)
+TakeOff_MessageReceived* Json_AndroidMessageConverter::tryParseTakeOffCommand(rapidjson::GenericObject<false, rapidjson::Value> &obj)
 {
     bool takeOff = obj["takeoff"].GetBool();
-    return TakeOff_MessageReceived{
+    return new TakeOff_MessageReceived{
         takeOff
     };
 }

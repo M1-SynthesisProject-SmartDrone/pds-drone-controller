@@ -28,11 +28,13 @@ void AndroidReceiver::init(uint16_t port)
 
 Abstract_AndroidReceivedMessage AndroidReceiver::receiveMessage()
 {
+    throw runtime_error("The class is not meant to be used anymore !");
+
     // Must be a too big buffer to work with
     char buffer[512];
     int bytesRead = m_UDPSocket->receiveMessage(buffer, 512);
 
-    return m_messageConverter->convertMessageReceived(string(buffer));
+    // return m_messageConverter->convertMessageReceived(string(buffer));
 }
 
 AndroidReceiver::~AndroidReceiver()

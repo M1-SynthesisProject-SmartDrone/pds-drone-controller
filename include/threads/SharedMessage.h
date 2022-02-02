@@ -1,17 +1,19 @@
 #ifndef __SHAREDMESSAGELIST_H__
 #define __SHAREDMESSAGELIST_H__
 
-/**
- * This Singleton is meant to be used by multiple threads.
- * 
- * @author Aldric Vitali Silvestre
- */
+
 #include "../android/message/Abstract_AndroidReceivedMessage.h"
 
 #include <queue>
 #include <condition_variable>
 #include <mutex>
 
+/**
+ * This Singleton is meant to be used by multiple threads.
+ *
+ * @deprecated
+ * @author Aldric Vitali Silvestre
+ */
 class SharedMessage
 {
 private:
@@ -26,7 +28,7 @@ private:
     bool isEmpty();
 
 public:
-    static SharedMessage* getInstance(); 
+    static SharedMessage* getInstance();
 
     Abstract_AndroidReceivedMessage pop();
     void add(Abstract_AndroidReceivedMessage message);

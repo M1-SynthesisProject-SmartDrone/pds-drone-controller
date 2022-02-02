@@ -5,9 +5,9 @@
 
 /**
  * Contains infos for arming / disarming drone
- * 
+ *
  * ex : {"armDrone":true}
- * 
+ *
  * @author Aldric Vitali Silvestre
  */
 struct Arm_MessageReceived : Abstract_AndroidReceivedMessage
@@ -17,8 +17,12 @@ struct Arm_MessageReceived : Abstract_AndroidReceivedMessage
     Arm_MessageReceived(bool armDrone)
     {
         this->messageType = MESSAGE_TYPE::ARM_COMMAND;
-        this->str =  "Arm_MessageReceived [ArmDrone = " + std::to_string(armDrone) + "]";
         this->armDrone = armDrone;
+    }
+
+    std::string toString()
+    {
+        return "Arm_MessageReceived [ArmDrone = " + std::to_string(armDrone) + "]";
     }
 };
 

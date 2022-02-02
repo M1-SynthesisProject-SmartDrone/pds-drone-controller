@@ -1,7 +1,8 @@
 /**
  * Wait for messages sent by the android application
  * and store them into understandable objects.
- *  
+ * 
+ * @deprecated
  * @author Aldric Vitali Silvestre
  */
 #ifndef ANDROID_RECEIVER_H

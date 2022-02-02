@@ -23,6 +23,8 @@
 #include "../drone/Data_Drone.h"
 #include "../drone/DroneManualCommand.h"
 
+#include "AndroidMessagesHolder.h"
+
 class DroneSender_ThreadClass : public Abstract_ThreadClass
 {
 private:
@@ -31,18 +33,23 @@ private:
      */
     std::shared_ptr<Drone> m_drone;
 
+    /**
+     * Same for the message handler, but this time it is because we need this instance in two threads.
+     */
+    std::shared_ptr<AndroidMessagesHolder> m_messageHolder;
+
     MavlinkTools m_mavlinkTools;
 
-    void onMessageReceived(Abstract_AndroidReceivedMessage androidMessage);
-    void sendArmMessage(Arm_MessageReceived armMessage);
-    void sendManualControlMessage(Manual_MessageReceived manualControlMessage);
-    void sendTakeOffMessage(TakeOff_MessageReceived takeOffMessage);
+    void onMessageReceived(Abstract_AndroidReceivedMessage* androidMessage);
+    void sendArmMessage(Arm_MessageReceived* armMessage);
+    void sendManualControlMessage(Manual_MessageReceived* manualControlMessage);
+    void sendTakeOffMessage(TakeOff_MessageReceived* takeOffMessage);
 
 public:
     /**
      * This class does not handle the openning of the connection (must be made at least in the calling class)
      */
-    DroneSender_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone);
+    DroneSender_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone, std::shared_ptr<AndroidMessagesHolder> messageHolder);
     ~DroneSender_ThreadClass();
 
     void run();

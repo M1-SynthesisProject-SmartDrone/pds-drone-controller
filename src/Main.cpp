@@ -62,8 +62,10 @@ int main(int argc, char* argv[])
     uint16_t androidPort = optionsParsed["port"].as<uint16_t>();
     bool useDrone = !optionsParsed["no_drone"].as<bool>();
 
-    shared_ptr<Drone> drone(new Drone());
+    auto drone = make_shared<Drone>();
     char* serialPathChar = &serialPath[0];
+
+    auto androidMessagesHolder = make_shared<AndroidMessagesHolder>();
 
     if (useDrone)
     {
@@ -85,12 +87,12 @@ int main(int argc, char* argv[])
 
 
     // The list of threads used by the app
-    vector<Abstract_ThreadClass*> threads;
-    threads.push_back(new AndroidReceiver_ThreadClass(1000, 200, androidPort));
+    vector<unique_ptr<Abstract_ThreadClass>> threads;
+    threads.push_back(make_unique<AndroidReceiver_ThreadClass>(1000, 200, androidPort, androidMessagesHolder));
     if (useDrone)
     {
-        threads.push_back(new DroneSender_ThreadClass(1000, 200, drone));
-        threads.push_back(new DroneReceiver_ThreadClass(1000, 200, drone));
+        threads.push_back(make_unique<DroneSender_ThreadClass>(1000, 200, drone, androidMessagesHolder));
+        threads.push_back(make_unique<DroneReceiver_ThreadClass>(1000, 200, drone));
     }
 
     // start all threads

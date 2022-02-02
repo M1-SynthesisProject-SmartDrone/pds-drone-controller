@@ -17,8 +17,12 @@ struct TakeOff_MessageReceived : Abstract_AndroidReceivedMessage
     TakeOff_MessageReceived(bool takeOff)
     {
         this->messageType = MESSAGE_TYPE::TAKE_OFF;
-        this->str = "TakeOff_MessageReceived [TakeOff = " + std::to_string(takeOff) + "]";
         this->takeOff = takeOff;
+    }
+
+    std::string toString()
+    {
+        return "TakeOff_MessageReceived [TakeOff = " + std::to_string(takeOff) + "]";
     }
 };
 
