@@ -3,11 +3,11 @@
  * @author Aldric Vitali Silvestre
  */
 
-#include "../../lib/loguru/loguru.hpp"
-#include "../../lib/mavlink/common/mavlink.h"
+#include <loguru/loguru.hpp>
+#include <mavlink/common/mavlink.h>
 
-#include "../../include/global_variables.h"
-#include "../../include/threads/DroneReceiver_ThreadClass.h"
+#include "global_variables.h"
+#include "threads/DroneReceiver_ThreadClass.h"
 #include <stdio.h>
 
 using namespace std;
@@ -34,7 +34,7 @@ void DroneReceiver_ThreadClass::run()
 
         currentState = LifeCoreState::RUN;
         mavlink_message_t mavlinkMessage;
-        if (m_drone.get()->read_message(mavlinkMessage))
+        if (m_drone->read_message(mavlinkMessage))
         {
             LOG_F(INFO, "Received message from px4 of id : %d ", mavlinkMessage.msgid);
 
@@ -90,14 +90,13 @@ void DroneReceiver_ThreadClass::run()
 void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck)
 {
     string buffer;
-    buffer = " Command :" + std::to_string(m_drone.get()->ack.command) + "\n";
-    buffer = buffer + " result: " + std::to_string(m_drone.get()->ack.result);
-    buffer = buffer + " result_param2: " + std::to_string(m_drone.get()->ack.result_param2) + "\n";
-    buffer = buffer + " progress: " + std::to_string(m_drone.get()->ack.progress) + "\n";
+    buffer = " Command :" + std::to_string(m_drone->ack.command) + "\n";
+    buffer = buffer + " result: " + std::to_string(m_drone->ack.result);
+    buffer = buffer + " result_param2: " + std::to_string(m_drone->ack.result_param2) + "\n";
+    buffer = buffer + " progress: " + std::to_string(m_drone->ack.progress) + "\n";
     cout << buffer << endl;
 
-    Drone *drone = m_drone.get();
-    drone->ack = commandAck;
+    m_drone->ack = commandAck;
 
     bool isResultAccepted = commandAck.result == MAV_RESULT_ACCEPTED;
     // Multiple sub commands to handle
@@ -107,7 +106,7 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
     case MAV_CMD_COMPONENT_ARM_DISARM:
         if (commandAck.result == MAV_RESULT_ACCEPTED)
         {
-            drone->motors = drone->motors == ARM ? UNARM : ARM;
+            m_drone->motors = m_drone->motors == ARM ? UNARM : ARM;
         }
         else if (commandAck.result != MAV_RESULT_IN_PROGRESS)
         {
@@ -132,15 +131,14 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_altitude_t altitude)
 {
     printf("Altitude : altitude_local %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
 
-    Drone *drone = m_drone.get();
-    drone->altitude = altitude;
+    m_drone->altitude = altitude;
 }
 
 void DroneReceiver_ThreadClass::updateDroneData(mavlink_global_position_int_t globalPosition)
 {
     string buffer1 = "\nGPS: " + std::to_string(globalPosition.lat) + " " + std::to_string(globalPosition.lon) + " " + std::to_string(globalPosition.alt) + "\n";
     cout << buffer1 << endl;
-    m_drone.get()->global_position_int = globalPosition;
+    m_drone->global_position_int = globalPosition;
 }
 
 void DroneReceiver_ThreadClass::updateDroneData(mavlink_raw_imu_t rawImu)
@@ -160,11 +158,11 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_highres_imu_t highresImu
     buffer1 = buffer1 + " Mag: " + std::to_string(highresImu.xmag) + " " + std::to_string(highresImu.ymag) + " " + std::to_string(highresImu.zmag) + "\n";
     buffer1 = buffer1 + " Temperature: " + std::to_string(highresImu.temperature) + "\n\n";
     cout << buffer1 << endl;
-    m_drone.get()->highres_imu = highresImu;
+    m_drone->highres_imu = highresImu;
 }
 
 void DroneReceiver_ThreadClass::updateDroneData(mavlink_battery_status_t batteryStatus)
 {
     printf("Battery status : %d \n", batteryStatus.battery_remaining);
-    m_drone.get()->battery_status = batteryStatus;
+    m_drone->battery_status = batteryStatus;
 }

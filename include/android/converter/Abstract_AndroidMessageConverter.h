@@ -7,7 +7,7 @@
  * @author Aldric Vitali Silvestre
  */
 
-#include "android/message/Abstract_AndroidReceivedMessage.h"
+#include "android/message/received/Abstract_AndroidReceivedMessage.h"
 #include <string>
 
 class Abstract_AndroidMessageConverter

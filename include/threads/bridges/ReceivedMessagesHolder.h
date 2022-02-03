@@ -4,13 +4,13 @@
 #include <memory>
 #include <condition_variable>
 #include <mutex>
-#include "android/message/Abstract_AndroidReceivedMessage.h"
+#include "android/message/received/Abstract_AndroidReceivedMessage.h"
 
 /**
  * Thread-safe class used to make the bridge between the android application and the ground station.
  */
 
-class AndroidMessagesHolder
+class ReceivedMessagesHolder
 {
 private:
     std::unique_ptr<Abstract_AndroidReceivedMessage> m_message;
@@ -19,8 +19,8 @@ private:
     std::condition_variable m_condition_variable;
 
 public:
-    AndroidMessagesHolder();
-    ~AndroidMessagesHolder();
+    ReceivedMessagesHolder();
+    ~ReceivedMessagesHolder();
 
     std::unique_ptr<Abstract_AndroidReceivedMessage> getLastMessage();
     void add(std::unique_ptr<Abstract_AndroidReceivedMessage> message);

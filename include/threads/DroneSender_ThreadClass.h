@@ -10,12 +10,11 @@
 #define __DRONESENDER_THREADCLASS_H__
 
 #include "Abstract_ThreadClass.h"
-#include "SharedMessage.h"
 
-#include "android/message/Abstract_AndroidReceivedMessage.h"
-#include "android/message/Arm_MessageReceived.h"
-#include "android/message/Manual_MessageReceived.h"
-#include "android/message/TakeOff_MessageReceived.h"
+#include "android/message/received/Abstract_AndroidReceivedMessage.h"
+#include "android/message/received/Arm_MessageReceived.h"
+#include "android/message/received/Manual_MessageReceived.h"
+#include "android/message/received/TakeOff_MessageReceived.h"
 
 #include "network/Com_Serial.h"
 #include "network/Com_Mavlink.h"
@@ -23,7 +22,7 @@
 #include "drone/Data_Drone.h"
 #include "drone/DroneManualCommand.h"
 
-#include "AndroidMessagesHolder.h"
+#include "threads/bridges/ReceivedMessagesHolder.h"
 
 class DroneSender_ThreadClass : public Abstract_ThreadClass
 {
@@ -36,7 +35,7 @@ private:
     /**
      * Same for the message handler, but this time it is because we need this instance in two threads.
      */
-    std::shared_ptr<AndroidMessagesHolder> m_messageHolder;
+    std::shared_ptr<ReceivedMessagesHolder> m_messageHolder;
 
     MavlinkTools m_mavlinkTools;
 
@@ -49,7 +48,7 @@ public:
     /**
      * This class does not handle the openning of the connection (must be made at least in the calling class)
      */
-    DroneSender_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone, std::shared_ptr<AndroidMessagesHolder> messageHolder);
+    DroneSender_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone, std::shared_ptr<ReceivedMessagesHolder> messageHolder);
     ~DroneSender_ThreadClass();
 
     void run();

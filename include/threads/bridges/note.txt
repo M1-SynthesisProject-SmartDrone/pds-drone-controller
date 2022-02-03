@@ -1,0 +1,2 @@
+This package contain all classes that share data between multiple threads.
+So all those classes are designed to be thread-safe

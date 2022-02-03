@@ -7,7 +7,7 @@
  *
  * @author Aldric Vitali Silvestre
  */
- // Library used : https://github.com/simdjson/simdjson
+ // Library used : https://rapidjson.org/
  
 #include <stdexcept>
 #include <algorithm>
@@ -18,14 +18,12 @@
 #include <loguru/loguru.hpp>
 
 #include "Abstract_AndroidMessageConverter.h"
-#include "android/message/Manual_MessageReceived.h"
-#include "android/message/Arm_MessageReceived.h"
-#include "android/message/TakeOff_MessageReceived.h"
 #include "android/message/MessageType.h"
-#include "android/message/Manual_MessageReceived.h"
+#include "android/message/received/Manual_MessageReceived.h"
+#include "android/message/received/Arm_MessageReceived.h"
+#include "android/message/received/TakeOff_MessageReceived.h"
+#include "android/message/received/Manual_MessageReceived.h"
 
-
-// All message types are hashed here in order to avoid string comparaisons
 
 class Json_AndroidMessageConverter : public Abstract_AndroidMessageConverter
 {

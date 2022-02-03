@@ -1,7 +1,7 @@
 #ifndef __ABSTRACT_ANDROIDRECEIVEDMESSAGE_H__
 #define __ABSTRACT_ANDROIDRECEIVEDMESSAGE_H__
 
-#include "Abstract_AndroidMessage.h"
+#include "android/message/Abstract_AndroidMessage.h"
 
 /**
  * All messages received from the android application will inherit this structure

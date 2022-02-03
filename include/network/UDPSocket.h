@@ -1,8 +1,8 @@
 #ifndef __UDPSOCKET_H__
 #define __UDPSOCKET_H__
 /**
- * A simple UDP socket that can send and receive messages 
- * 
+ * A simple UDP socket that can send and receive messages
+ *
  * @author Aldric Vitali Silvestre
  */
 
@@ -19,8 +19,8 @@ public:
     ~UDPSocket();
 
     void bindPort(uint16_t port);
-    void sendMessage(const std::string &ipAddress, uint16_t port, const char *buffer, int length, int flags = 0);
-    int receiveMessage(char *buffer, int length, int flags = 0);
+    void sendMessage(const std::string& ipAddress, uint16_t port, const char* buffer, int length, int flags = 0);
+    int receiveMessage(char* buffer, int length, sockaddr_in& sender, int flags = 0);
 
     // ==== GETTERS ====
     uint16_t getPort();

@@ -13,7 +13,6 @@
 #include "threads/AndroidReceiver_ThreadClass.h"
 #include "threads/DroneSender_ThreadClass.h"
 #include "threads/DroneReceiver_ThreadClass.h"
-#include "threads/SharedMessage.h"
 #include "network/Com_Serial.h"
 #include "drone/Data_Drone.h"
 
@@ -62,10 +61,11 @@ int main(int argc, char* argv[])
     uint16_t androidPort = optionsParsed["port"].as<uint16_t>();
     bool useDrone = !optionsParsed["no_drone"].as<bool>();
 
-    auto drone = make_shared<Drone>();
     char* serialPathChar = &serialPath[0];
 
-    auto androidMessagesHolder = make_shared<AndroidMessagesHolder>();
+    auto drone = make_shared<Drone>();
+    auto receivedMessagesHolder = make_shared<ReceivedMessagesHolder>();
+    auto androidUdpSocket = make_shared<AndroidUDPSocket>(androidPort);
 
     if (useDrone)
     {
@@ -88,15 +88,15 @@ int main(int argc, char* argv[])
 
     // The list of threads used by the app
     vector<unique_ptr<Abstract_ThreadClass>> threads;
-    threads.push_back(make_unique<AndroidReceiver_ThreadClass>(1000, 200, androidPort, androidMessagesHolder));
+    threads.push_back(make_unique<AndroidReceiver_ThreadClass>(1000, 200, androidUdpSocket, receivedMessagesHolder));
     if (useDrone)
     {
-        threads.push_back(make_unique<DroneSender_ThreadClass>(1000, 200, drone, androidMessagesHolder));
+        threads.push_back(make_unique<DroneSender_ThreadClass>(1000, 200, drone, receivedMessagesHolder));
         threads.push_back(make_unique<DroneReceiver_ThreadClass>(1000, 200, drone));
     }
 
     // start all threads
-    LOG_F(INFO, "Stored %ld threads", threads.size());
+    LOG_F(INFO, "%ld threads stored", threads.size());
     for (auto& thread : threads)
     {
         thread->start();

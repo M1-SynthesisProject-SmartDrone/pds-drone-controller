@@ -1,6 +1,6 @@
-#include "../../include/network/UDPSocket.h"
+#include "network/UDPSocket.h"
 
-#include "../../lib/loguru/loguru.hpp"
+#include <loguru/loguru.hpp>
 
 #include <system_error>
 #include <stdexcept>
@@ -59,16 +59,15 @@ void UDPSocket::sendMessage(const std::string &ipAddress, uint16_t port, const c
     // LOG_F(INFO, "Message sent to %s", ipAddress.c_str());
 }
 
-int UDPSocket::receiveMessage(char *buffer, int bufferLength, int flags)
+int UDPSocket::receiveMessage(char *buffer, int bufferLength, sockaddr_in& sender, int flags)
 {
-    sockaddr_in from;
-    socklen_t size = sizeof(from);
-    int bytesRead  = recvfrom(m_socket, buffer, bufferLength, flags, (struct sockaddr *)&from, &size) < 0;
+    socklen_t size = sizeof(sender);
+    int bytesRead  = recvfrom(m_socket, buffer, bufferLength, flags, (struct sockaddr *)&sender, &size) < 0;
     if(bytesRead  < 0)
     {
         throw system_error(errno, system_category(), "Cannot receive message");
     }
-    // LOG_F(INFO, "Message received from %s", inet_ntoa(from.sin_addr));
+    // LOG_F(INFO, "Message received from %s", inet_ntoa(sender.sin_addr));
     return bytesRead;
 }
 

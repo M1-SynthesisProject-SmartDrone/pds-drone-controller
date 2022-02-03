@@ -9,7 +9,6 @@
  */
 
 #include "Abstract_ThreadClass.h"
-#include "SharedMessage.h"
 
 #include "drone/Data_Drone.h"
 

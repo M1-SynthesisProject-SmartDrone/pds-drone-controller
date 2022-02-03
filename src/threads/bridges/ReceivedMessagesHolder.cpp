@@ -1,14 +1,14 @@
-#include "../../include/threads/AndroidMessagesHolder.h"
+#include "threads/bridges/ReceivedMessagesHolder.h"
 
 using namespace std;
 
-AndroidMessagesHolder::AndroidMessagesHolder()
+ReceivedMessagesHolder::ReceivedMessagesHolder()
 {}
 
-AndroidMessagesHolder::~AndroidMessagesHolder()
+ReceivedMessagesHolder::~ReceivedMessagesHolder()
 {}
 
-unique_ptr<Abstract_AndroidReceivedMessage> AndroidMessagesHolder::getLastMessage()
+unique_ptr<Abstract_AndroidReceivedMessage> ReceivedMessagesHolder::getLastMessage()
 {
     unique_lock<mutex> lock(m_lock);
     // Make the thread wait until we have one message 
@@ -17,7 +17,7 @@ unique_ptr<Abstract_AndroidReceivedMessage> AndroidMessagesHolder::getLastMessag
     return move(m_message);
 }
 
-void AndroidMessagesHolder::add(unique_ptr<Abstract_AndroidReceivedMessage> message)
+void ReceivedMessagesHolder::add(unique_ptr<Abstract_AndroidReceivedMessage> message)
 {
     unique_lock<mutex> lock(m_lock);
     // If we have a message lying here, free it !

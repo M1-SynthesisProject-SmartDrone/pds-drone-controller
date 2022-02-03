@@ -1,16 +1,15 @@
-#include "../../include/threads/DroneSender_ThreadClass.h"
+#include "threads/DroneSender_ThreadClass.h"
 
-#include "../../lib/loguru/loguru.hpp"
-#include "../../include/threads/SharedMessage.h"
+#include <loguru/loguru.hpp>
 
-#include "../../include/network/Com_Mavlink.h"
-#include "../../include/global_variables.h" 
+#include "network/Com_Mavlink.h"
+#include "global_variables.h" 
 
 #include <sstream>
 
 using namespace std;
 
-DroneSender_ThreadClass::DroneSender_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone, std::shared_ptr<AndroidMessagesHolder> messageHolder)
+DroneSender_ThreadClass::DroneSender_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone, std::shared_ptr<ReceivedMessagesHolder> messageHolder)
     : Abstract_ThreadClass(task_period, task_deadline)
 {
     m_drone = drone;
@@ -85,32 +84,29 @@ void DroneSender_ThreadClass::sendTakeOffMessage(TakeOff_MessageReceived* takeOf
         m_drone.get()->landing();
     }
 }
-    
+
 void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage* androidMessage)
 {
     switch (androidMessage->messageType)
     {
     case MESSAGE_TYPE::ARM_COMMAND:
-    // * Brackets are made to avoid cross initialization error (var defined in all scopes)
-    // see : https://stackoverflow.com/questions/11578936/getting-a-bunch-of-crosses-initialization-error#answer-11578973
+        // * Brackets are made to avoid cross initialization error (var defined in all scopes)
+        // see : https://stackoverflow.com/questions/11578936/getting-a-bunch-of-crosses-initialization-error#answer-11578973
     {
         Arm_MessageReceived* armMessage = static_cast<Arm_MessageReceived*>(androidMessage);
         sendArmMessage(armMessage);
-        free(armMessage); // can it break ?
     }
     break;
     case MESSAGE_TYPE::MANUAL_CONTROL:
     {
         Manual_MessageReceived* manualMessage = static_cast<Manual_MessageReceived*>(androidMessage);
         sendManualControlMessage(manualMessage);
-        free(manualMessage);
     }
     break;
     case MESSAGE_TYPE::TAKE_OFF:
     {
         TakeOff_MessageReceived* takeOffMessage = static_cast<TakeOff_MessageReceived*>(androidMessage);
         sendTakeOffMessage(takeOffMessage);
-        free(takeOffMessage);
     }
     break;
     case MESSAGE_TYPE::UNKNOWN:
