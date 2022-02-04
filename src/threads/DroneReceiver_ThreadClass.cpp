@@ -13,8 +13,8 @@
 using namespace std;
 
 
-DroneReceiver_ThreadClass::DroneReceiver_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone)
-    : Abstract_ThreadClass(task_period, task_deadline)
+DroneReceiver_ThreadClass::DroneReceiver_ThreadClass(std::shared_ptr<Drone> drone)
+    : Abstract_ThreadClass(1000, 200)
 {
     m_drone = drone;
 }

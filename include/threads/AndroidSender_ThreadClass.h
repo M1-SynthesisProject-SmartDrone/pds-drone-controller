@@ -1,27 +1,33 @@
-#ifndef __ANDROIDRECEIVER_THREADCLASS_H__
-#define __ANDROIDRECEIVER_THREADCLASS_H__
+#ifndef __ANDROIDSENDER_THREADCLASS_H__
+#define __ANDROIDSENDER_THREADCLASS_H__
 
 /**
- * Implementation of the Abstract_ThreadClass used to send 
+ * Implementation of the Abstract_ThreadClass used to send
  * messages from the android application
- * 
+ *
  * @author Aldric Vitali Silvestre
  */
 
 #include "Abstract_ThreadClass.h"
 
 #include "drone/Data_Drone.h"
+#include "android/AndroidUDPSocket.h"
+#include "android/converter/Abstract_AndroidMessageConverter.h"
 
-class AndroidReceiver_ThreadClass : public Abstract_ThreadClass
+class AndroidSender_ThreadClass : public Abstract_ThreadClass
 {
 private:
-    uint16_t m_udpPort;
     std::shared_ptr<Drone> m_drone;
+    std::shared_ptr<AndroidUDPSocket> m_udpSocket;
+    std::shared_ptr<Abstract_AndroidMessageConverter> m_messageConverter;
 
 public:
-    AndroidReceiver_ThreadClass(int task_period, int task_deadline, uint16_t udpPort, std::shared_ptr<Drone> drone);
-    ~AndroidReceiver_ThreadClass();
+    AndroidSender_ThreadClass(std::shared_ptr<Drone> drone, 
+        std::shared_ptr<AndroidUDPSocket> udpSocket,
+        std::shared_ptr<Abstract_AndroidMessageConverter> messageConverter);
+    ~AndroidSender_ThreadClass();
 
     void run();
 };
-#endif // __ANDROIDRECEIVER_THREADCLASS_H__
+
+#endif // __ANDROIDSENDER_THREADCLASS_H__

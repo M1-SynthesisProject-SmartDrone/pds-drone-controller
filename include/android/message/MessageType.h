@@ -3,9 +3,13 @@
 
 
 typedef enum {
+    // RECEIVED MESSAGE TYPES
     ARM_COMMAND,
     MANUAL_CONTROL,
     TAKE_OFF,
+    // TO SEND MESSAGE TYPES
+    ANSWER,
+    // GLOBAL
     UNKNOWN
 } MESSAGE_TYPE;
 #endif // __MESSAGETYPE_H__

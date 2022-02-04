@@ -7,9 +7,10 @@
 /**
  * All messages related to android inherit this struct
  */
-struct Abstract_AndroidMessage{
+struct Abstract_AndroidMessage
+{
     MESSAGE_TYPE messageType;
-    
+
     virtual std::string toString() = 0;
 };
 

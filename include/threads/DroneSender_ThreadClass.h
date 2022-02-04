@@ -40,15 +40,15 @@ private:
     MavlinkTools m_mavlinkTools;
 
     void onMessageReceived(Abstract_AndroidReceivedMessage* androidMessage);
-    void sendArmMessage(Arm_MessageReceived* armMessage);
-    void sendManualControlMessage(Manual_MessageReceived* manualControlMessage);
-    void sendTakeOffMessage(TakeOff_MessageReceived* takeOffMessage);
+    void handleArmMessage(Arm_MessageReceived* armMessage);
+    void handleManualControlMessage(Manual_MessageReceived* manualControlMessage);
+    void handleTakeOffMessage(TakeOff_MessageReceived* takeOffMessage);
 
 public:
     /**
      * This class does not handle the openning of the connection (must be made at least in the calling class)
      */
-    DroneSender_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone, std::shared_ptr<ReceivedMessagesHolder> messageHolder);
+    DroneSender_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ReceivedMessagesHolder> messageHolder);
     ~DroneSender_ThreadClass();
 
     void run();

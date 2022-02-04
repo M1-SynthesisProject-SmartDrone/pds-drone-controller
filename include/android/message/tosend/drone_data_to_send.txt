@@ -1,0 +1,6 @@
+
+We want :
+    Battery status
+    GPS position (X, y, z)
+    Gyroscope & Mag
+    altitude (laquelle : altitude_relative ou altitude_amsl (sea level))

@@ -9,8 +9,8 @@
 
 using namespace std;
 
-DroneSender_ThreadClass::DroneSender_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone, std::shared_ptr<ReceivedMessagesHolder> messageHolder)
-    : Abstract_ThreadClass(task_period, task_deadline)
+DroneSender_ThreadClass::DroneSender_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ReceivedMessagesHolder> messageHolder)
+    : Abstract_ThreadClass(1000, 200)
 {
     m_drone = drone;
     m_messageHolder = messageHolder;
@@ -47,7 +47,7 @@ void DroneSender_ThreadClass::run()
     LOG_F(INFO, "End of thread");
 }
 
-void DroneSender_ThreadClass::sendArmMessage(Arm_MessageReceived* armMessage)
+void DroneSender_ThreadClass::handleArmMessage(Arm_MessageReceived* armMessage)
 {
     // we probably want to make some verfications here
     LOG_F(INFO, "Send arming command");
@@ -55,7 +55,7 @@ void DroneSender_ThreadClass::sendArmMessage(Arm_MessageReceived* armMessage)
     m_drone->command_arm(command);
 }
 
-void DroneSender_ThreadClass::sendManualControlMessage(Manual_MessageReceived* manualControlMessage)
+void DroneSender_ThreadClass::handleManualControlMessage(Manual_MessageReceived* manualControlMessage)
 {
     // Don't log here, we will have a LOT of commands here
     m_drone->command_directControl(
@@ -70,7 +70,7 @@ void DroneSender_ThreadClass::sendManualControlMessage(Manual_MessageReceived* m
     );
 }
 
-void DroneSender_ThreadClass::sendTakeOffMessage(TakeOff_MessageReceived* takeOffMessage)
+void DroneSender_ThreadClass::handleTakeOffMessage(TakeOff_MessageReceived* takeOffMessage)
 {
     // we probably want to check some conditions here (grounded, etc.)
     if (takeOffMessage->takeOff)
@@ -94,24 +94,24 @@ void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage*
         // see : https://stackoverflow.com/questions/11578936/getting-a-bunch-of-crosses-initialization-error#answer-11578973
     {
         Arm_MessageReceived* armMessage = static_cast<Arm_MessageReceived*>(androidMessage);
-        sendArmMessage(armMessage);
+        handleArmMessage(armMessage);
     }
     break;
     case MESSAGE_TYPE::MANUAL_CONTROL:
     {
         Manual_MessageReceived* manualMessage = static_cast<Manual_MessageReceived*>(androidMessage);
-        sendManualControlMessage(manualMessage);
+        handleManualControlMessage(manualMessage);
     }
     break;
     case MESSAGE_TYPE::TAKE_OFF:
     {
         TakeOff_MessageReceived* takeOffMessage = static_cast<TakeOff_MessageReceived*>(androidMessage);
-        sendTakeOffMessage(takeOffMessage);
+        handleTakeOffMessage(takeOffMessage);
     }
     break;
     case MESSAGE_TYPE::UNKNOWN:
     default:
-        throw runtime_error("Unknown message type");
+        throw runtime_error("Unknown message type, or illegal one");
         break;
     }
 

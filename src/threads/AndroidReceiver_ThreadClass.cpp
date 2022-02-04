@@ -4,15 +4,15 @@
 
 using namespace std;
 
-AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(int task_period, 
-    int task_deadline, 
+AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(
     shared_ptr<AndroidUDPSocket> androidUdpSocket,
-    shared_ptr<ReceivedMessagesHolder> messageHolder)
-    : Abstract_ThreadClass(task_period, task_deadline)
+    shared_ptr<ReceivedMessagesHolder> messageHolder,
+    shared_ptr<Abstract_AndroidMessageConverter> messageConverter)
+    : Abstract_ThreadClass(1000, 200)
 {
     m_UDPSocket = androidUdpSocket;
     m_messageHolder = messageHolder;
-    m_messageConverter = make_unique<Json_AndroidMessageConverter>();
+    m_messageConverter = messageConverter;
 }
 
 AndroidReceiver_ThreadClass::~AndroidReceiver_ThreadClass()

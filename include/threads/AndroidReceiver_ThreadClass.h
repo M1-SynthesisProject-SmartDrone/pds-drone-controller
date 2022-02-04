@@ -22,16 +22,15 @@ class AndroidReceiver_ThreadClass : public Abstract_ThreadClass
 private:
     std::shared_ptr<ReceivedMessagesHolder> m_messageHolder;
     std::shared_ptr<AndroidUDPSocket> m_UDPSocket;
-    
-    std::unique_ptr<Abstract_AndroidMessageConverter> m_messageConverter;
+    std::shared_ptr<Abstract_AndroidMessageConverter> m_messageConverter;
 
+    // Methods
     std::unique_ptr<Abstract_AndroidReceivedMessage> receiveMessage();
-    
+
 public:
-    AndroidReceiver_ThreadClass(int task_period,
-        int task_deadline, 
-        std::shared_ptr<AndroidUDPSocket> AndroidUDPSocket,
-        std::shared_ptr<ReceivedMessagesHolder> messageHolder);
+    AndroidReceiver_ThreadClass(std::shared_ptr<AndroidUDPSocket> AndroidUDPSocket,
+        std::shared_ptr<ReceivedMessagesHolder> messageHolder,
+        std::shared_ptr<Abstract_AndroidMessageConverter> messageConverter);
     ~AndroidReceiver_ThreadClass();
 
     void run();

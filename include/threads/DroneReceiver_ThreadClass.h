@@ -24,7 +24,7 @@ private:
     void updateDroneData(mavlink_battery_status_t batteryStatus);
 
 public:
-    DroneReceiver_ThreadClass(int task_period, int task_deadline, std::shared_ptr<Drone> drone);
+    DroneReceiver_ThreadClass(std::shared_ptr<Drone> drone);
     ~DroneReceiver_ThreadClass();
 
     void run();
