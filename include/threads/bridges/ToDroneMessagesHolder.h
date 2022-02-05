@@ -10,7 +10,7 @@
  * Thread-safe class used to make the bridge between the android application and the ground station.
  */
 
-class ReceivedMessagesHolder
+class ToDroneMessagesHolder
 {
 private:
     std::unique_ptr<Abstract_AndroidReceivedMessage> m_message;
@@ -19,8 +19,8 @@ private:
     std::condition_variable m_condition_variable;
 
 public:
-    ReceivedMessagesHolder();
-    ~ReceivedMessagesHolder();
+    ToDroneMessagesHolder();
+    ~ToDroneMessagesHolder();
 
     std::unique_ptr<Abstract_AndroidReceivedMessage> getLastMessage();
     void add(std::unique_ptr<Abstract_AndroidReceivedMessage> message);

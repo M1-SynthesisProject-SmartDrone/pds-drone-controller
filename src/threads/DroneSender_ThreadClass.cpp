@@ -9,7 +9,7 @@
 
 using namespace std;
 
-DroneSender_ThreadClass::DroneSender_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ReceivedMessagesHolder> messageHolder)
+DroneSender_ThreadClass::DroneSender_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ToDroneMessagesHolder> messageHolder)
     : Abstract_ThreadClass(1000, 200)
 {
     m_drone = drone;

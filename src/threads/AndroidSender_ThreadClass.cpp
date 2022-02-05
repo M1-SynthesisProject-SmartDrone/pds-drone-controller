@@ -1,33 +1,64 @@
 #include "threads/AndroidSender_ThreadClass.h"
 
+using namespace std;
 
 AndroidSender_ThreadClass::AndroidSender_ThreadClass(std::shared_ptr<Drone> drone,
     std::shared_ptr<AndroidUDPSocket> udpSocket,
+    std::shared_ptr<ToAppMessagesHolder> appMsgHolder,
     std::shared_ptr<Abstract_AndroidMessageConverter> messageConverter
-    ) :Abstract_ThreadClass(1000, 200)
+) : Abstract_ThreadClass(200, 1000)
 {
     m_drone = drone;
     m_udpSocket = udpSocket;
     m_messageConverter = messageConverter;
+    m_appMsgHolder = appMsgHolder;
 }
 
+AndroidSender_ThreadClass::~AndroidSender_ThreadClass()
+{}
 
 void AndroidSender_ThreadClass::run()
 {
     loguru::set_thread_name("android sender thread");
-    // wait messages
     LOG_F(INFO, "Start waiting for messages to send");
+
+    m_timeRemainingMs = TIME_BETWEEN_UPDATES_MS;
+
     while (isRunFlag())
     {
+        // COUNTER BEGIN
+        auto timeBegin = chrono::steady_clock::now();
         usleep(task_period);
+        m_timeRemainingMs -= task_period;
         try
         {
-            // TODO
+            // We want to send a message about the drone each 10 seconds
+            // BUT, if we have a message in the appMsgHolder, we want to treat it first !
+            // So : timeout wait on appMsgHolder (special method)
+
+            auto message = m_appMsgHolder->pop(m_timeRemainingMs);
+            if (message == nullptr)
+            {
+                LOG_F(INFO, "Send Drone update message");
+                m_timeRemainingMs = TIME_BETWEEN_UPDATES_MS;
+                // We don't have to do anything now (and we don't want to update m_timeRemainingMs)
+                continue;
+            }
+            else
+            {
+                LOG_F(INFO, "Send message from queue");
+            }
+
+
         }
         catch (const std::exception& e)
         {
             LOG_F(ERROR, e.what());
         }
+        // COUNTER END
+        auto timeEnd = chrono::steady_clock::now();
+        int64_t timeExecMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count();
+        m_timeRemainingMs -= timeExecMs;
     }
 }
 

@@ -9,7 +9,7 @@
  */
 
 #include "Abstract_ThreadClass.h"
-#include "threads/bridges/ReceivedMessagesHolder.h"
+#include "threads/bridges/ToDroneMessagesHolder.h"
 #include <memory>
 
 #include "drone/Data_Drone.h"
@@ -20,7 +20,7 @@
 class AndroidReceiver_ThreadClass : public Abstract_ThreadClass
 {
 private:
-    std::shared_ptr<ReceivedMessagesHolder> m_messageHolder;
+    std::shared_ptr<ToDroneMessagesHolder> m_messageHolder;
     std::shared_ptr<AndroidUDPSocket> m_UDPSocket;
     std::shared_ptr<Abstract_AndroidMessageConverter> m_messageConverter;
 
@@ -29,7 +29,7 @@ private:
 
 public:
     AndroidReceiver_ThreadClass(std::shared_ptr<AndroidUDPSocket> AndroidUDPSocket,
-        std::shared_ptr<ReceivedMessagesHolder> messageHolder,
+        std::shared_ptr<ToDroneMessagesHolder> messageHolder,
         std::shared_ptr<Abstract_AndroidMessageConverter> messageConverter);
     ~AndroidReceiver_ThreadClass();
 

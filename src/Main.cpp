@@ -11,10 +11,13 @@
 
 #include "threads/Abstract_ThreadClass.h"
 #include "threads/AndroidReceiver_ThreadClass.h"
+#include "threads/AndroidSender_ThreadClass.h"
 #include "threads/DroneSender_ThreadClass.h"
 #include "threads/DroneReceiver_ThreadClass.h"
 #include "network/Com_Serial.h"
 #include "drone/Data_Drone.h"
+
+#include "android/message/tosend/Answer_MessageToSend.h"
 
 using namespace std;
 
@@ -62,7 +65,8 @@ int main(int argc, char* argv[])
     bool useDrone = !optionsParsed["no_drone"].as<bool>();
 
     auto drone = make_shared<Drone>();
-    auto receivedMessagesHolder = make_shared<ReceivedMessagesHolder>();
+    auto toDroneMessagesHolder = make_shared<ToDroneMessagesHolder>();
+    auto toAppMessagesHolder = make_shared<ToAppMessagesHolder>();
     auto androidUdpSocket = make_shared<AndroidUDPSocket>(androidPort);
     auto messageConverter = make_shared<Json_AndroidMessageConverter>();
 
@@ -87,10 +91,11 @@ int main(int argc, char* argv[])
 
     // The list of threads used by the app
     vector<unique_ptr<Abstract_ThreadClass>> threads;
-    threads.push_back(make_unique<AndroidReceiver_ThreadClass>(androidUdpSocket, receivedMessagesHolder, messageConverter));
+    threads.push_back(make_unique<AndroidReceiver_ThreadClass>(androidUdpSocket, toDroneMessagesHolder, messageConverter));
+    threads.push_back(make_unique<AndroidSender_ThreadClass>(drone, androidUdpSocket, toAppMessagesHolder, messageConverter));
     if (useDrone)
     {
-        threads.push_back(make_unique<DroneSender_ThreadClass>(drone, receivedMessagesHolder));
+        threads.push_back(make_unique<DroneSender_ThreadClass>(drone, toDroneMessagesHolder));
         threads.push_back(make_unique<DroneReceiver_ThreadClass>(drone));
     }
 
@@ -100,6 +105,11 @@ int main(int argc, char* argv[])
     {
         thread->start();
     }
+
+    // TEST : add a message to send to app
+    auto answer = make_unique<Answer_MessageToSend>(true, "TEST");
+    sleep(5);
+    toAppMessagesHolder->add(move(answer));
 
     for (auto& thread : threads)
     {

@@ -22,7 +22,7 @@
 #include "drone/Data_Drone.h"
 #include "drone/DroneManualCommand.h"
 
-#include "threads/bridges/ReceivedMessagesHolder.h"
+#include "threads/bridges/ToDroneMessagesHolder.h"
 
 class DroneSender_ThreadClass : public Abstract_ThreadClass
 {
@@ -35,7 +35,7 @@ private:
     /**
      * Same for the message handler, but this time it is because we need this instance in two threads.
      */
-    std::shared_ptr<ReceivedMessagesHolder> m_messageHolder;
+    std::shared_ptr<ToDroneMessagesHolder> m_messageHolder;
 
     MavlinkTools m_mavlinkTools;
 
@@ -48,7 +48,7 @@ public:
     /**
      * This class does not handle the openning of the connection (must be made at least in the calling class)
      */
-    DroneSender_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ReceivedMessagesHolder> messageHolder);
+    DroneSender_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ToDroneMessagesHolder> messageHolder);
     ~DroneSender_ThreadClass();
 
     void run();

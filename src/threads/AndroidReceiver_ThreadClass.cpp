@@ -6,7 +6,7 @@ using namespace std;
 
 AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(
     shared_ptr<AndroidUDPSocket> androidUdpSocket,
-    shared_ptr<ReceivedMessagesHolder> messageHolder,
+    shared_ptr<ToDroneMessagesHolder> messageHolder,
     shared_ptr<Abstract_AndroidMessageConverter> messageConverter)
     : Abstract_ThreadClass(1000, 200)
 {

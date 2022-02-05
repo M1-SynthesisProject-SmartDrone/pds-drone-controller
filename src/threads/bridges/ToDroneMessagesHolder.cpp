@@ -1,14 +1,14 @@
-#include "threads/bridges/ReceivedMessagesHolder.h"
+#include "threads/bridges/ToDroneMessagesHolder.h"
 
 using namespace std;
 
-ReceivedMessagesHolder::ReceivedMessagesHolder()
+ToDroneMessagesHolder::ToDroneMessagesHolder()
 {}
 
-ReceivedMessagesHolder::~ReceivedMessagesHolder()
+ToDroneMessagesHolder::~ToDroneMessagesHolder()
 {}
 
-unique_ptr<Abstract_AndroidReceivedMessage> ReceivedMessagesHolder::getLastMessage()
+unique_ptr<Abstract_AndroidReceivedMessage> ToDroneMessagesHolder::getLastMessage()
 {
     unique_lock<mutex> lock(m_lock);
     // Make the thread wait until we have one message 
@@ -17,7 +17,7 @@ unique_ptr<Abstract_AndroidReceivedMessage> ReceivedMessagesHolder::getLastMessa
     return move(m_message);
 }
 
-void ReceivedMessagesHolder::add(unique_ptr<Abstract_AndroidReceivedMessage> message)
+void ToDroneMessagesHolder::add(unique_ptr<Abstract_AndroidReceivedMessage> message)
 {
     unique_lock<mutex> lock(m_lock);
     // If we have a message lying here, free it !

@@ -13,17 +13,24 @@
 #include "drone/Data_Drone.h"
 #include "android/AndroidUDPSocket.h"
 #include "android/converter/Abstract_AndroidMessageConverter.h"
+#include "threads/bridges/ToAppMessagesHolder.h"
 
 class AndroidSender_ThreadClass : public Abstract_ThreadClass
 {
 private:
     std::shared_ptr<Drone> m_drone;
     std::shared_ptr<AndroidUDPSocket> m_udpSocket;
+    std::shared_ptr<ToAppMessagesHolder> m_appMsgHolder;
     std::shared_ptr<Abstract_AndroidMessageConverter> m_messageConverter;
+
+    // Timing attributes
+    int64_t m_timeRemainingMs;
+    const int64_t TIME_BETWEEN_UPDATES_MS = 1000 * 4;
 
 public:
     AndroidSender_ThreadClass(std::shared_ptr<Drone> drone, 
         std::shared_ptr<AndroidUDPSocket> udpSocket,
+        std::shared_ptr<ToAppMessagesHolder> appMsgHolder,
         std::shared_ptr<Abstract_AndroidMessageConverter> messageConverter);
     ~AndroidSender_ThreadClass();
 
