@@ -9,6 +9,7 @@ typedef enum {
     TAKE_OFF,
     // TO SEND MESSAGE TYPES
     ANSWER,
+    DRONE_DATA,
     // GLOBAL
     UNKNOWN
 } MESSAGE_TYPE;

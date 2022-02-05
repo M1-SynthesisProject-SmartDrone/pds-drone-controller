@@ -29,7 +29,7 @@ struct DroneData_MessageToSend : Abstract_AndroidToSendMessage
     /**
      * Altitude above ground (mm)
      */
-    int32_t relative_alt;
+    int32_t relativeAlt;
 
     /**
      * Ground spped (cm/s)
@@ -42,7 +42,12 @@ struct DroneData_MessageToSend : Abstract_AndroidToSendMessage
      * Drone rotation (cdeg)
      * Angle arround z-axis (from top to bottom), a.k.a "yaw"
      */ 
-    uint16_t hdg;
+    uint16_t yawRotation;
+
+    DroneData_MessageToSend()
+    {
+        this->messageType = MESSAGE_TYPE::DRONE_DATA;
+    }
 };
 
 #endif // __DRONE_MESSAGETOSEND_H__

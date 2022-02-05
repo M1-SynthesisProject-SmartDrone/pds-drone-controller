@@ -106,11 +106,6 @@ int main(int argc, char* argv[])
         thread->start();
     }
 
-    // TEST : add a message to send to app
-    auto answer = make_unique<Answer_MessageToSend>(true, "TEST");
-    sleep(5);
-    toAppMessagesHolder->add(move(answer));
-
     for (auto& thread : threads)
     {
         thread->join();

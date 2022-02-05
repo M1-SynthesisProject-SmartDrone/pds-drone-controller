@@ -39,17 +39,17 @@ void AndroidSender_ThreadClass::run()
             auto message = m_appMsgHolder->pop(m_timeRemainingMs);
             if (message == nullptr)
             {
-                LOG_F(INFO, "Send Drone update message");
+                // LOG_F(INFO, "Send Drone update message");
+                sendUpdateMessage();
                 m_timeRemainingMs = TIME_BETWEEN_UPDATES_MS;
                 // We don't have to do anything now (and we don't want to update m_timeRemainingMs)
                 continue;
             }
             else
             {
-                LOG_F(INFO, "Send message from queue");
+                // LOG_F(INFO, "Send message from queue");
+                sendQueueMessage(move(message));
             }
-
-
         }
         catch (const std::exception& e)
         {
@@ -60,5 +60,40 @@ void AndroidSender_ThreadClass::run()
         int64_t timeExecMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeBegin).count();
         m_timeRemainingMs -= timeExecMs;
     }
+}
+
+void AndroidSender_ThreadClass::sendUpdateMessage()
+{
+    auto droneUpdateMessage = fetchDroneData();
+    string toSend = m_messageConverter->convertToSendMessage(droneUpdateMessage.get());
+    m_udpSocket->sendAsResponse(m_udpSocket->getPort(), toSend.c_str(), toSend.length());
+}
+
+void AndroidSender_ThreadClass::sendQueueMessage(unique_ptr<Abstract_AndroidToSendMessage> toSendMessage) 
+{
+    string toSend = m_messageConverter->convertToSendMessage(toSendMessage.get());
+    m_udpSocket->sendAsResponse(m_udpSocket->getPort(), toSend.c_str(), toSend.length());
+}
+
+unique_ptr<DroneData_MessageToSend> AndroidSender_ThreadClass::fetchDroneData()
+{
+    auto data = make_unique<DroneData_MessageToSend>();
+    
+    // Copy drone important structs
+    auto globalPosition = m_drone->global_position_int;
+    auto batteryStatus = m_drone->battery_status;
+    // auto highresImu = m_drone->highres_imu;
+
+    data->batteryRemaining = batteryStatus.battery_remaining;
+    data->lat = globalPosition.lat;
+    data->lon = globalPosition.lon;
+    data->alt = globalPosition.alt;
+    data->relativeAlt = globalPosition.relative_alt;
+    data->vx = globalPosition.vx;
+    data->vy = globalPosition.vy;
+    data->vz = globalPosition.vz;
+    data->yawRotation = globalPosition.hdg;
+
+    return data;
 }
 
