@@ -2,21 +2,16 @@
  *
  * @author Aldric Vitali Silvestre
  */
-
-#include <loguru/loguru.hpp>
-#include <mavlink/common/mavlink.h>
-
-#include "global_variables.h"
 #include "threads/DroneReceiver_ThreadClass.h"
-#include <stdio.h>
 
 using namespace std;
 
 
-DroneReceiver_ThreadClass::DroneReceiver_ThreadClass(std::shared_ptr<Drone> drone)
+DroneReceiver_ThreadClass::DroneReceiver_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ToAppMessagesHolder> appMessagesHolder)
     : Abstract_ThreadClass(1000, 200)
 {
     m_drone = drone;
+    m_appMessagesHolder = appMessagesHolder;
 }
 
 DroneReceiver_ThreadClass::~DroneReceiver_ThreadClass()
@@ -99,7 +94,7 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
     m_drone->ack = commandAck;
 
     bool isResultAccepted = commandAck.result == MAV_RESULT_ACCEPTED;
-    // Multiple sub commands to handle
+    // Multiple sub commands to handle (change drone data + send messages to app)
     switch (commandAck.command) 
     {
     // If arm / unarm, change the motor state
@@ -112,10 +107,14 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
             {
                 m_drone->tookOff = false;
             }
+            auto toSend = make_unique<Answer_MessageToSend>("ARM", true);
+            m_appMessagesHolder->add(move(toSend));
         }
         else if (commandAck.result != MAV_RESULT_IN_PROGRESS)
         {
             LOG_F(ERROR, "Arm / Disarm : receive error of type %d : result2 = %d", commandAck.result, commandAck.result_param2);
+            auto toSend = make_unique<Answer_MessageToSend>("ARM", false, "The drone send a negative answer");
+            m_appMessagesHolder->add(move(toSend));
         }
         break;
     case MAVLINK_MSG_ID_MANUAL_CONTROL:
@@ -128,20 +127,28 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
         if (commandAck.result == MAV_RESULT_ACCEPTED)
         {
             m_drone->tookOff = true;
+            auto toSend = make_unique<Answer_MessageToSend>("TAKE_OFF", true);
+            m_appMessagesHolder->add(move(toSend));
         }
         else if (commandAck.result != MAV_RESULT_IN_PROGRESS)
         {
             LOG_F(ERROR, "Take off : receive error of type %d : result2 = %d", commandAck.result, commandAck.result_param2);
+            auto toSend = make_unique<Answer_MessageToSend>("TAKE_OFF", false);
+            m_appMessagesHolder->add(move(toSend));
         }
         break;
     case MAV_CMD_NAV_LAND:
         if (commandAck.result == MAV_RESULT_ACCEPTED)
         {
             m_drone->tookOff = false;
+            auto toSend = make_unique<Answer_MessageToSend>("LAND", true);
+            m_appMessagesHolder->add(move(toSend));
         }
         else if (commandAck.result != MAV_RESULT_IN_PROGRESS)
         {
             LOG_F(ERROR, "Land : receive error of type %d : result2 = %d", commandAck.result, commandAck.result_param2);
+            auto toSend = make_unique<Answer_MessageToSend>("LAND", false);
+            m_appMessagesHolder->add(move(toSend));
         }
     }
 }

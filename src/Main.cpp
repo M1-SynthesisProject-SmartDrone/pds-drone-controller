@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
     if (useDrone)
     {
         threads.push_back(make_unique<DroneSender_ThreadClass>(drone, toDroneMessagesHolder, toAppMessagesHolder));
-        threads.push_back(make_unique<DroneReceiver_ThreadClass>(drone));
+        threads.push_back(make_unique<DroneReceiver_ThreadClass>(drone, toAppMessagesHolder));
     }
 
     // start all threads

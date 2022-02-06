@@ -8,13 +8,22 @@
  * @author Aldric Vitali Silvestre
  */
 
-#include "./Abstract_ThreadClass.h"
+#include <loguru/loguru.hpp>
+#include <mavlink/common/mavlink.h>
+#include <stdio.h>
+
+
+#include "Abstract_ThreadClass.h"
+#include "global_variables.h"
 #include "drone/Data_Drone.h"
+#include "threads/bridges/ToAppMessagesHolder.h"
+#include "android/message/tosend/Answer_MessageToSend.h"
 
 class DroneReceiver_ThreadClass : public Abstract_ThreadClass
 {
 private:
     std::shared_ptr<Drone> m_drone;
+    std::shared_ptr<ToAppMessagesHolder> m_appMessagesHolder;
 
     void updateDroneData(mavlink_altitude_t altitude);
     void updateDroneData(mavlink_command_ack_t commandAck);
@@ -24,7 +33,7 @@ private:
     void updateDroneData(mavlink_battery_status_t batteryStatus);
 
 public:
-    DroneReceiver_ThreadClass(std::shared_ptr<Drone> drone);
+    DroneReceiver_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ToAppMessagesHolder> appMessagesHolder);
     ~DroneReceiver_ThreadClass();
 
     void run();

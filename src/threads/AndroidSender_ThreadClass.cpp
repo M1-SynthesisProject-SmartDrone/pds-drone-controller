@@ -20,13 +20,14 @@ AndroidSender_ThreadClass::~AndroidSender_ThreadClass()
 void AndroidSender_ThreadClass::run()
 {
     loguru::set_thread_name("android sender thread");
-    LOG_F(INFO, "Start waiting for messages to send");
+    LOG_F(INFO, "Started : waiting for connection");
 
     m_timeRemainingMs = TIME_BETWEEN_UPDATES_MS;
 
     // The first time, we want the drone to wait on connection with app, 
     // so we can wait indefinitely in the message holder
     m_appMsgHolder->waitForMessages();
+    LOG_F(INFO, "Start waiting for messages to send");
 
     while (isRunFlag())
     {
