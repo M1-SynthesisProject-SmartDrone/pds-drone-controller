@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     threads.push_back(make_unique<AndroidSender_ThreadClass>(drone, androidUdpSocket, toAppMessagesHolder, messageConverter));
     if (useDrone)
     {
-        threads.push_back(make_unique<DroneSender_ThreadClass>(drone, toDroneMessagesHolder));
+        threads.push_back(make_unique<DroneSender_ThreadClass>(drone, toDroneMessagesHolder, toAppMessagesHolder));
         threads.push_back(make_unique<DroneReceiver_ThreadClass>(drone));
     }
 

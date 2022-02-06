@@ -125,10 +125,13 @@ public:
 	Drone_Communication drone_communication;
 
 	Drone_Motors motors = UNARM;
+	// We at least want to know if drone is flying
+	bool tookOff = false;
+
 	//	Drone_mode mode=DRONE_OFF;
 
 
-		//Communication part
+	//Communication part
 	Drone_Communication communication = DRONE_SERIAL;
 	std::shared_ptr<Serial_Port> serial1;
 	std::shared_ptr<Wifi_Port> wifi1;

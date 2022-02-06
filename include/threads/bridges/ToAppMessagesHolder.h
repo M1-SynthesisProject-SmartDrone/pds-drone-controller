@@ -31,6 +31,12 @@ public:
     ToAppMessagesHolder(/* args */);
     ~ToAppMessagesHolder();
 
+    /**
+     * Blocks calling thread until at least one message is in the queue.
+     * This method does not remove the message from the queue.
+     */
+    void waitForMessages();
+
     std::unique_ptr<Abstract_AndroidToSendMessage> pop();
     /**
      * Can return nullptr (if timeout exceeded)

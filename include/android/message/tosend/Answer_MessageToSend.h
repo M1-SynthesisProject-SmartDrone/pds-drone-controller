@@ -10,12 +10,14 @@ struct Answer_MessageToSend : Abstract_AndroidToSendMessage
 {
     bool validated;
     std::string name;
+    std::string message;
 
-    Answer_MessageToSend(bool validated, std::string name)
+    Answer_MessageToSend(std::string name, bool validated, std::string message="")
     {
         this->messageType = MESSAGE_TYPE::ANSWER;
         this->name = name;
         this->validated = validated;
+        this->message = message;
     }
 
     std::string toString()

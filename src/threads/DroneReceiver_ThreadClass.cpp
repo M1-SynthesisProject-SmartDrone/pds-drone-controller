@@ -107,6 +107,11 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
         if (commandAck.result == MAV_RESULT_ACCEPTED)
         {
             m_drone->motors = m_drone->motors == ARM ? UNARM : ARM;
+            // Normally, if the drone is unarmed, it must be landed too
+            if (m_drone->motors == UNARM)
+            {
+                m_drone->tookOff = false;
+            }
         }
         else if (commandAck.result != MAV_RESULT_IN_PROGRESS)
         {
@@ -119,11 +124,25 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
             LOG_F(ERROR, "Manual control : receive error of type %d : result2 = %d", commandAck.result, commandAck.result_param2);
         }
         break;
-    // case MAV_CMD_NAV_TAKEOFF:
-    //     if (commandAck.result == MAV_RESULT_ACCEPTED)
-    //     {
-    //         // We could update the drone state, if have one
-    //     }
+    case MAV_CMD_NAV_TAKEOFF:
+        if (commandAck.result == MAV_RESULT_ACCEPTED)
+        {
+            m_drone->tookOff = true;
+        }
+        else if (commandAck.result != MAV_RESULT_IN_PROGRESS)
+        {
+            LOG_F(ERROR, "Take off : receive error of type %d : result2 = %d", commandAck.result, commandAck.result_param2);
+        }
+        break;
+    case MAV_CMD_NAV_LAND:
+        if (commandAck.result == MAV_RESULT_ACCEPTED)
+        {
+            m_drone->tookOff = false;
+        }
+        else if (commandAck.result != MAV_RESULT_IN_PROGRESS)
+        {
+            LOG_F(ERROR, "Land : receive error of type %d : result2 = %d", commandAck.result, commandAck.result_param2);
+        }
     }
 }
 

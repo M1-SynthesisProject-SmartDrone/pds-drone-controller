@@ -13,11 +13,18 @@ bool ToAppMessagesHolder::isQueueEmpty()
     return m_messagesQueue.empty();
 }
 
+void ToAppMessagesHolder::waitForMessages()
+{
+    unique_lock<mutex> lock(m_lock);
+    m_condition_variable.wait(lock, lambdaQueueFilled);
+}
+
 std::unique_ptr<Abstract_AndroidToSendMessage> ToAppMessagesHolder::pop()
 {
     unique_lock<mutex> lock(m_lock);
     // Make the thread wait until we have one message 
     m_condition_variable.wait(lock, lambdaQueueFilled);
+    // ! WARN : no double check, can cause issues if two threads want this resource (not the case here)
     auto message = move(m_messagesQueue.front());
     m_messagesQueue.pop();
     return move(message);

@@ -24,6 +24,10 @@ void AndroidSender_ThreadClass::run()
 
     m_timeRemainingMs = TIME_BETWEEN_UPDATES_MS;
 
+    // The first time, we want the drone to wait on connection with app, 
+    // so we can wait indefinitely in the message holder
+    m_appMsgHolder->waitForMessages();
+
     while (isRunFlag())
     {
         // COUNTER BEGIN

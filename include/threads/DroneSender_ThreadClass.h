@@ -16,6 +16,8 @@
 #include "android/message/received/Manual_MessageReceived.h"
 #include "android/message/received/TakeOff_MessageReceived.h"
 
+#include "android/message/tosend/Answer_MessageToSend.h"
+
 #include "network/Com_Serial.h"
 #include "network/Com_Mavlink.h"
 
@@ -23,6 +25,7 @@
 #include "drone/DroneManualCommand.h"
 
 #include "threads/bridges/ToDroneMessagesHolder.h"
+#include "threads/bridges/ToAppMessagesHolder.h"
 
 class DroneSender_ThreadClass : public Abstract_ThreadClass
 {
@@ -35,7 +38,9 @@ private:
     /**
      * Same for the message handler, but this time it is because we need this instance in two threads.
      */
-    std::shared_ptr<ToDroneMessagesHolder> m_messageHolder;
+    std::shared_ptr<ToDroneMessagesHolder> m_droneMessagesHolder;
+
+    std::shared_ptr<ToAppMessagesHolder> m_appMessagesHolder;
 
     MavlinkTools m_mavlinkTools;
 
@@ -48,7 +53,9 @@ public:
     /**
      * This class does not handle the openning of the connection (must be made at least in the calling class)
      */
-    DroneSender_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ToDroneMessagesHolder> messageHolder);
+    DroneSender_ThreadClass(std::shared_ptr<Drone> drone, 
+        std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder, 
+        std::shared_ptr<ToAppMessagesHolder> appMessagesHolder);
     ~DroneSender_ThreadClass();
 
     void run();

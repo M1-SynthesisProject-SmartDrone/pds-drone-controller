@@ -9,11 +9,15 @@
 
 using namespace std;
 
-DroneSender_ThreadClass::DroneSender_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ToDroneMessagesHolder> messageHolder)
+DroneSender_ThreadClass::DroneSender_ThreadClass(
+    std::shared_ptr<Drone> drone,
+    std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder,
+    std::shared_ptr<ToAppMessagesHolder> appMessagesHolder)
     : Abstract_ThreadClass(1000, 200)
 {
     m_drone = drone;
-    m_messageHolder = messageHolder;
+    m_droneMessagesHolder = droneMessageHolder;
+    m_appMessagesHolder = appMessagesHolder;
 }
 
 DroneSender_ThreadClass::~DroneSender_ThreadClass()
@@ -26,9 +30,9 @@ void DroneSender_ThreadClass::run()
 
     while (isRunFlag())
     {
-
+        usleep(task_period);
         // wait for message to come, then send it to the drone
-        auto message = m_messageHolder->getLastMessage();
+        auto message = m_droneMessagesHolder->getLastMessage();
         // LOG_F(INFO, "Process message : Action = %ld Value =%lf", message.action, message.value);
 
         // while (m_drone.get()->motors == Drone_Motors::UNARM);
@@ -51,29 +55,32 @@ void DroneSender_ThreadClass::handleArmMessage(Arm_MessageReceived* armMessage)
 {
     // we probably want to make some verfications here
     LOG_F(INFO, "Send arming command");
-    int command = armMessage->armDrone ? 1 : 0;
-    m_drone->command_arm(command);
-}
-
-void DroneSender_ThreadClass::handleManualControlMessage(Manual_MessageReceived* manualControlMessage)
-{
-    // Don't log here, we will have a LOT of commands here
-    m_drone->command_directControl(
-        // -1000 = back, 1000 = forward
-        manualControlMessage->forwardMove * 1000,
-        // -1000 = left, 1000 = right
-        manualControlMessage->leftMove * -1000,
-        // -1000 = min thrust, 1000 = max thrust
-        manualControlMessage->motorPower * 1000,
-        // -1000 = clockwise, 1000 = counter-clockwise
-        manualControlMessage->leftRotation * 1000
-    );
+    bool arm = armMessage->armDrone;
+    if ((arm && m_drone->motors == Drone_Motors::ARM) || (!arm && m_drone->motors == Drone_Motors::UNARM))
+    {
+        LOG_F(INFO, "Arm : Drone motors already in wanted state");
+        // Technically this is already done, so the operation is a success
+        auto toSend = make_unique<Answer_MessageToSend>("ARM", true, "Drone already in wanted state");
+        m_appMessagesHolder->add(move(toSend));
+    }
+    else
+    {
+        int command = arm ? 1 : 0;
+        m_drone->command_arm(command);
+    }
 }
 
 void DroneSender_ThreadClass::handleTakeOffMessage(TakeOff_MessageReceived* takeOffMessage)
 {
-    // we probably want to check some conditions here (grounded, etc.)
-    if (takeOffMessage->takeOff)
+    bool takeOff = takeOffMessage->takeOff;
+    if (takeOff && m_drone->tookOff)
+    {
+        LOG_F(INFO, "Take off : Drone is already at wanted state");
+        auto toSend = make_unique<Answer_MessageToSend>("TAKE_OFF", true, "Drone already in wanted state");
+        m_appMessagesHolder->add(move(toSend));
+    }
+    // ! We probably want to check some conditions here (grounded, etc.)
+    else if (takeOff)
     {
         LOG_F(INFO, "Send Take off command");
         m_drone.get()->take_off();
@@ -83,6 +90,21 @@ void DroneSender_ThreadClass::handleTakeOffMessage(TakeOff_MessageReceived* take
         LOG_F(INFO, "Send landing command");
         m_drone.get()->landing();
     }
+}
+
+void DroneSender_ThreadClass::handleManualControlMessage(Manual_MessageReceived* manualControlMessage)
+{
+    // Don't log here, we will have a LOT of commands here
+    m_drone->command_directControl(
+        // -1000 = back, 1000 = forward
+        manualControlMessage->forwardMove * 1000.0,
+        // -1000 = left, 1000 = right
+        manualControlMessage->leftMove * -1000.0,
+        // -1000 = min thrust, 1000 = max thrust
+        manualControlMessage->motorPower * 1000.0,
+        // -1000 = clockwise, 1000 = counter-clockwise
+        manualControlMessage->leftRotation * 1000.0
+    );
 }
 
 void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage* androidMessage)

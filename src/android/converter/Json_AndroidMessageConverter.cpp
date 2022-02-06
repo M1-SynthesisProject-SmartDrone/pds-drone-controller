@@ -150,6 +150,7 @@ Document Json_AndroidMessageConverter::convertAnswerMessage(Answer_MessageToSend
     {
         content.AddMember("name", StringRef(answer->name.c_str()), allocator);
         content.AddMember("validated", answer->validated ? true : false, allocator);
+        content.AddMember("message", StringRef(answer->message.c_str()), allocator);
     }
     document.AddMember("content", content, allocator);
 
