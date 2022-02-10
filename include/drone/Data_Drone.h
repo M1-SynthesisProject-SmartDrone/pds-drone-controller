@@ -33,7 +33,8 @@
  /**
   * Define about drone communication protocol. it's use to automatic open specific communication
   */
-enum Drone_Communication {
+enum Drone_Communication
+{
 	DRONE_WIFI,
 	DRONE_SERIAL,
 	DRONE_DUAL
@@ -42,7 +43,8 @@ enum Drone_Communication {
 /**
  * define about drone mode
  */
-enum Drone_Motors {
+enum Drone_Motors
+{
 	ARM,
 	UNARM
 };
@@ -50,7 +52,8 @@ enum Drone_Motors {
 /**
  * define about drone mode
  */
-enum Drone_mode {
+enum Drone_mode
+{
 	DRONE_OFF,
 	DRONE_MANUAL_DIRECT
 
@@ -58,7 +61,8 @@ enum Drone_mode {
 };
 
 
-enum class FlightMode {
+enum class FlightMode
+{
 	Unknown,
 	Ready,
 	Takeoff,
@@ -77,9 +81,11 @@ enum class FlightMode {
 };
 
 
-namespace px4 {
+namespace px4
+{
 
-	enum PX4_CUSTOM_MAIN_MODE {
+	enum PX4_CUSTOM_MAIN_MODE
+	{
 		PX4_CUSTOM_MAIN_MODE_MANUAL = 1,
 		PX4_CUSTOM_MAIN_MODE_ALTCTL,
 		PX4_CUSTOM_MAIN_MODE_POSCTL,
@@ -90,7 +96,8 @@ namespace px4 {
 		PX4_CUSTOM_MAIN_MODE_RATTITUDE
 	};
 
-	enum PX4_CUSTOM_SUB_MODE_AUTO {
+	enum PX4_CUSTOM_SUB_MODE_AUTO
+	{
 		PX4_CUSTOM_SUB_MODE_AUTO_READY = 1,
 		PX4_CUSTOM_SUB_MODE_AUTO_TAKEOFF,
 		PX4_CUSTOM_SUB_MODE_AUTO_LOITER,
@@ -101,8 +108,10 @@ namespace px4 {
 		PX4_CUSTOM_SUB_MODE_AUTO_FOLLOW_TARGET
 	};
 
-	union px4_custom_mode {
-		struct {
+	union px4_custom_mode
+	{
+		struct
+		{
 			uint16_t reserved;
 			uint8_t main_mode;
 			uint8_t sub_mode;
@@ -231,6 +240,18 @@ public:
 	 * Need to have before intialize the communication
 	 */
 	int init_parameters(uint limit);
+
+	// %%%%%%%%%%%%%%%%%%%%%%%%%%% CHANGE MODES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	/**
+	 * This mode need the GPS to be active and the drone to be in a stabilized state
+	 */
+	int setMode_position();
+
+	/**
+	 * This mode does not require the GPS to be active, but the drone will not react to wind blows affecting its position
+	 */
+	int setMode_altitude();
 
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%% MANUAL_CONTROL API %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
