@@ -28,7 +28,7 @@ int AndroidUDPSocket::receiveAndSaveSender(char *buffer, int bufferLength, int f
     int nbBytesReceived = UDPSocket::receiveMessage(buffer, bufferLength, sender, flags);
 
     unique_lock<mutex> lock(m_lock);
-    if (areAddrEquals(sender, m_senderAddr))
+    if (!areAddrEquals(sender, m_senderAddr))
     {
         m_senderAddr = sender;
     }

@@ -14,7 +14,7 @@ class ToDroneMessagesHolder
 {
 private:
     std::unique_ptr<Abstract_AndroidReceivedMessage> m_message;
-    bool m_isLastMessageTreated = false;
+    bool m_isLastMessageTreated = true;
     std::mutex m_lock;
     std::condition_variable m_condition_variable;
 

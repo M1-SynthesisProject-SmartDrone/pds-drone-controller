@@ -73,7 +73,7 @@ void DroneSender_ThreadClass::handleArmMessage(Arm_MessageReceived* armMessage)
 void DroneSender_ThreadClass::handleTakeOffMessage(TakeOff_MessageReceived* takeOffMessage)
 {
     bool takeOff = takeOffMessage->takeOff;
-    if (takeOff && m_drone->tookOff)
+    if (takeOff == m_drone->tookOff)
     {
         LOG_F(INFO, "Take off : Drone is already at wanted state");
         auto toSend = make_unique<Answer_MessageToSend>("TAKE_OFF", true, "Drone already in wanted state");

@@ -132,7 +132,7 @@ Arm_MessageReceived* Json_AndroidMessageConverter::tryParseArmCommand(GenericObj
 
 TakeOff_MessageReceived* Json_AndroidMessageConverter::tryParseTakeOffCommand(GenericObject<false, Value>& obj)
 {
-    bool takeOff = obj["takeoff"].GetBool();
+    bool takeOff = obj["takeOff"].GetBool();
     return new TakeOff_MessageReceived{
         takeOff
     };

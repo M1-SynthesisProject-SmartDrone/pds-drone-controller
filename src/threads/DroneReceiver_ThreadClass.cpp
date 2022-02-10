@@ -31,7 +31,7 @@ void DroneReceiver_ThreadClass::run()
         mavlink_message_t mavlinkMessage;
         if (m_drone->read_message(mavlinkMessage))
         {
-            LOG_F(INFO, "Received message from px4 of id : %d ", mavlinkMessage.msgid);
+            // LOG_F(INFO, "Received message from px4 of id : %d ", mavlinkMessage.msgid);
 
             // ? Add a timestamp check ?
             switch (mavlinkMessage.msgid)
@@ -40,7 +40,7 @@ void DroneReceiver_ThreadClass::run()
                 mavlink_altitude_t altitude;
                 mavlink_msg_altitude_decode(&mavlinkMessage, &altitude);
                 updateDroneData(altitude);
-                printf("altitude_local  %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
+                // printf("altitude_local  %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
                 break;
 
             case MAVLINK_MSG_ID_COMMAND_ACK:
@@ -73,7 +73,7 @@ void DroneReceiver_ThreadClass::run()
                 updateDroneData(battery_status);
                 break;
             default:
-                LOG_F(INFO, "Unknown message id");
+                // LOG_F(INFO, "Unknown message id");
                 break;
             }
 
@@ -155,7 +155,7 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
 
 void DroneReceiver_ThreadClass::updateDroneData(mavlink_altitude_t altitude)
 {
-    printf("Altitude : altitude_local %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
+    // printf("Altitude : altitude_local %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
 
     m_drone->altitude = altitude;
 }
@@ -163,7 +163,7 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_altitude_t altitude)
 void DroneReceiver_ThreadClass::updateDroneData(mavlink_global_position_int_t globalPosition)
 {
     string buffer1 = "\nGPS: " + std::to_string(globalPosition.lat) + " " + std::to_string(globalPosition.lon) + " " + std::to_string(globalPosition.alt) + "\n";
-    cout << buffer1 << endl;
+    // cout << buffer1 << endl;
     m_drone->global_position_int = globalPosition;
 }
 
@@ -173,7 +173,7 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_raw_imu_t rawImu)
     string buffer1 = "mavlink_raw_imu_t : Acc: " + std::to_string(rawImu.xacc) + " " + std::to_string(rawImu.yacc) + " " + std::to_string(rawImu.zacc) + "\n";
     buffer1 = buffer1 + " Gyro: " + std::to_string(rawImu.xgyro) + " " + std::to_string(rawImu.ygyro) + " " + std::to_string(rawImu.zgyro) + "\n";
     buffer1 = buffer1 + " Mag: " + std::to_string(rawImu.xmag) + " " + std::to_string(rawImu.ymag) + " " + std::to_string(rawImu.zmag) + "\n";
-    cout << buffer1 << endl;
+    // cout << buffer1 << endl;
 }
 
 void DroneReceiver_ThreadClass::updateDroneData(mavlink_highres_imu_t highresImu)
@@ -183,12 +183,12 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_highres_imu_t highresImu
     buffer1 = buffer1 + " Gyro: " + std::to_string(highresImu.xgyro) + " " + std::to_string(highresImu.ygyro) + " " + std::to_string(highresImu.zgyro) + "\n";
     buffer1 = buffer1 + " Mag: " + std::to_string(highresImu.xmag) + " " + std::to_string(highresImu.ymag) + " " + std::to_string(highresImu.zmag) + "\n";
     buffer1 = buffer1 + " Temperature: " + std::to_string(highresImu.temperature) + "\n\n";
-    cout << buffer1 << endl;
+    // cout << buffer1 << endl;
     m_drone->highres_imu = highresImu;
 }
 
 void DroneReceiver_ThreadClass::updateDroneData(mavlink_battery_status_t batteryStatus)
 {
-    printf("Battery status : %d \n", batteryStatus.battery_remaining);
+    // printf("Battery status : %d \n", batteryStatus.battery_remaining);
     m_drone->battery_status = batteryStatus;
 }
