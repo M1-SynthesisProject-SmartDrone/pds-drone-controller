@@ -110,10 +110,10 @@ MESSAGE_TYPE Json_AndroidMessageConverter::findMessageType(Document& doc)
 
 Manual_MessageReceived* Json_AndroidMessageConverter::tryParseManualCommand(GenericObject<false, Value>& obj)
 {
-    double leftMove = obj["leftmove"].GetDouble();
-    double leftRotation = obj["leftrotation"].GetDouble();
-    double forwardMove = obj["forwardmove"].GetDouble();
-    double motorPower = obj["motorpower"].GetDouble();
+    double leftMove = obj["y"].GetDouble();
+    double leftRotation = obj["r"].GetDouble();
+    double forwardMove = obj["x"].GetDouble();
+    double motorPower = obj["z"].GetDouble();
     return new Manual_MessageReceived{
         leftMove,
         leftRotation,
