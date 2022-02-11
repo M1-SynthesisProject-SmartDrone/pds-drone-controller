@@ -7,10 +7,17 @@
  */
 
 
-#include <string>
+#include <loguru/loguru.hpp>
+
+#include <system_error>
+#include <stdexcept>
+#include <arpa/inet.h>
+#include <string.h>
+#include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
+#include <errno.h>
+#include <unistd.h>
 
 class UDPSocket
 {

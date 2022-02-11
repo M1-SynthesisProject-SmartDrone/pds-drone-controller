@@ -28,20 +28,20 @@ void initDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
 {
     LOG_F(INFO, "Try connecting to drone on %s with baudrate %d", serialPath, serialBaudrate);
     drone.get()->open(serialPath, serialBaudrate);
-    if (drone.get()->init_communication() != 0)
+    if (drone->init_communication() != 0)
     {
         stringstream ss;
         ss << "Cannot init communication : " << strerror(errno);
         throw runtime_error(ss.str());
     }
 
-    LOG_F(INFO, "Try init drone parameters");
-    if (drone.get()->init_parameters(DRONE_TIMEOUT_LIMIT) != 0)
-    {
-        stringstream ss;
-        ss << "Cannot init parameters : " << strerror(errno);
-        throw runtime_error(ss.str());
-    }
+    // LOG_F(INFO, "Try init drone parameters");
+    // if (drone->init_parameters(DRONE_TIMEOUT_LIMIT) != 0)
+    // {
+    //     stringstream ss;
+    //     ss << "Cannot init parameters : " << strerror(errno);
+    //     throw runtime_error(ss.str());
+    // }
 }
 
 int main(int argc, char* argv[])

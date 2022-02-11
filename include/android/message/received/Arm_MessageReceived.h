@@ -22,7 +22,8 @@ struct Arm_MessageReceived : Abstract_AndroidReceivedMessage
 
     std::string toString()
     {
-        return "Arm_MessageReceived [ArmDrone = " + std::to_string(armDrone) + "]";
+        std::string av = (this->armDrone ? "true" : "false");
+        return "Arm_MessageReceived [ArmDrone = " + av + "]";
     }
 };
 

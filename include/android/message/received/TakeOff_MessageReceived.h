@@ -22,7 +22,8 @@ struct TakeOff_MessageReceived : Abstract_AndroidReceivedMessage
 
     std::string toString()
     {
-        return "TakeOff_MessageReceived [TakeOff = " + std::to_string(takeOff) + "]";
+        std::string tv = (this->takeOff ? "true" : "false");
+        return "TakeOff_MessageReceived [TakeOff = " + tv + "]";
     }
 };
 
