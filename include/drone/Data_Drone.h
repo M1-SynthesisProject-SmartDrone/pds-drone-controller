@@ -253,6 +253,10 @@ public:
 	 */
 	int setMode_altitude();
 
+	int setMode_manual();
+
+	int setMode_stabilized();
+
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%% MANUAL_CONTROL API %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 	/**

@@ -35,13 +35,18 @@ void initDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
         throw runtime_error(ss.str());
     }
 
-    // LOG_F(INFO, "Try init drone parameters");
-    // if (drone->init_parameters(DRONE_TIMEOUT_LIMIT) != 0)
-    // {
-    //     stringstream ss;
-    //     ss << "Cannot init parameters : " << strerror(errno);
-    //     throw runtime_error(ss.str());
-    // }
+    LOG_F(INFO, "Try init drone parameters");
+    if (drone->init_parameters(DRONE_TIMEOUT_LIMIT) != 0)
+    {
+        stringstream ss;
+        ss << "Cannot init parameters : " << strerror(errno);
+        throw runtime_error(ss.str());
+    }
+    drone->setMode_position();
+    usleep(1000 * 10); // 10ms
+
+    // drone->command_arm(1);
+    // usleep(1000 * 10); // 10ms
 }
 
 int main(int argc, char* argv[])

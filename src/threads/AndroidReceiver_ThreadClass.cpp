@@ -29,7 +29,7 @@ void AndroidReceiver_ThreadClass::run()
         try
         {
             unique_ptr<Abstract_AndroidReceivedMessage> messageReceived = this->receiveMessage();
-            LOG_F(INFO, messageReceived->toString().c_str());
+            // LOG_F(INFO, messageReceived->toString().c_str());
             m_messageHolder->add(move(messageReceived));
         }
         catch (const std::exception& e)

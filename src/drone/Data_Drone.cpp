@@ -151,7 +151,7 @@ int Drone::setMode_position()
     command.target_component = 1;
     command.command = MAV_CMD_DO_SET_MODE;
     command.confirmation = false;
-    command.param1 = MAV_MODE_STABILIZE_ARMED;
+    command.param1 = 209;
     command.param2 = 3;
     command.param3 = 0;
     mavlink_msg_command_long_encode(255, 1, &message, &command);
@@ -166,12 +166,57 @@ int Drone::setMode_altitude()
     command.target_component = 1;
     command.command = MAV_CMD_DO_SET_MODE;
     command.confirmation = false;
-    command.param1 = MAV_MODE_MANUAL_ARMED;
+    command.param1 = 193;
     command.param2 = 2;
     command.param3 = 0;
     mavlink_msg_command_long_encode(255, 1, &message, &command);
     return write_message(message);
 }
+
+int Drone::setMode_manual()
+{
+    mavlink_message_t message;
+    mavlink_command_long_t command = mavlink_newCommand();
+    command.target_system = 1;
+    command.target_component = 1;
+    command.command = MAV_CMD_DO_SET_MODE;
+    command.confirmation = false;
+    command.param1 = 217;
+    command.param2 = 1;
+    command.param3 = 0;
+    mavlink_msg_command_long_encode(255, 1, &message, &command);
+    return write_message(message);
+}
+
+int Drone::setMode_stabilized()
+{
+    mavlink_message_t message;
+    mavlink_command_long_t command = mavlink_newCommand();
+    command.target_system = 1;
+    command.target_component = 1;
+    command.command = MAV_CMD_DO_SET_MODE;
+    command.confirmation = false;
+    command.param1 = 209;
+    command.param2 = 7;
+    command.param3 = 0;
+    mavlink_msg_command_long_encode(255, 1, &message, &command);
+    return write_message(message);
+}
+
+// int Drone::setMode_stabilized()
+// {
+//     mavlink_message_t message;
+//     mavlink_command_long_t command = mavlink_newCommand();
+//     command.target_system = 1;
+//     command.target_component = 1;
+//     command.command = MAV_CMD_DO_SET_MODE;
+//     command.confirmation = false;
+//     command.param1 = 209;
+//     command.param2 = 7;
+//     command.param3 = 0;
+//     mavlink_msg_command_long_encode(255, 1, &message, &command);
+//     return write_message(message);
+// }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%% MANUAL_CONTROL API %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 int Drone::manual_control(DroneManualCommand manualCommand)
@@ -212,7 +257,7 @@ int Drone::command_arm(int param1)
     command.command = MAV_CMD_COMPONENT_ARM_DISARM;
     command.confirmation = false;
     command.param1 = param1;
-    command.param2 = 21196;     //21196;  Force Arm/disarm  0 // ????
+    command.param2 = 21196;     //21196;  Force Arm/disarm  0
 
     mavlink_msg_command_long_encode(255, 1, &message, &command);
 
@@ -700,7 +745,7 @@ int Drone::command_directControl(float x, float y, float z, float r)
                                                         //zz : Generally corresponds to a separate slider movement with maximum being 1000 and minimum being -1000 on a joystick and the thrust of a vehicle.
                                                         //rr : Generally corresponds to a twisting of the joystick, with counter-clockwise being 1000 and clockwise being -1000, and the yaw of a vehicle. 
 
-    cout << "command_directControl  : " << xx << " " << yy << " " << zz << " " << rr << " " << endl;
+    // cout << "command_directControl  : " << xx << " " << yy << " " << zz << " " << rr << " " << endl;
     return write_message(message);
     // return 1;
 }

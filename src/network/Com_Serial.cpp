@@ -421,7 +421,7 @@ int Serial_Port::_write_port(char *buf, unsigned len)
 	tcdrain(fd);
 	auto stop = high_resolution_clock::now();
 	auto duration = duration_cast<microseconds>(stop - start);
-	cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
+	// cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
 
 	pthread_mutex_unlock(&lock);
 

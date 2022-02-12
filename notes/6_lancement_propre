@@ -1,0 +1,15 @@
+La commande arm_disarm renvoie 1 (TEMPORARLY REJECTED)
+
+    On veut changer  des params
+        - COM_PREARM_MODE = 0
+        - CBRK_IO_SAFETY = 22027
+
+    ==> déjà avec les bonnes valeurs, mais fait quand même les checks à l'armement
+
+OK C'EST BON 
+    - mode position
+    - armement
+    - On a pas longtemps pour le démarrer 
+        ==> Mettre la puissance moteur à + de 62,5%
+    - Jouer avec
+    - Si on se "pose" (donc moteur à 0%), il s'arrête et se désarme tout seul
