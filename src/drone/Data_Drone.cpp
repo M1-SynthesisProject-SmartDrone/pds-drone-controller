@@ -15,7 +15,7 @@
 using namespace std;
 
 
-#include "../../include/drone/Data_Drone.h"
+#include "drone/Data_Drone.h"
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTRUCTOR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,7 +116,7 @@ int Drone::init_parameters(uint limit)
     while (flag_test)
     {
 
-        flag_success = serial1.get()->read_message(mavlink_message);
+        flag_success = serial1->read_message(mavlink_message);
         if (flag_success)
         {
             system_id = mavlink_message.sysid;
@@ -246,7 +246,7 @@ int Drone::manual_control(DroneManualCommand manualCommand)
 /**
  * Arm with 1, un arm with 0
  */
-int Drone::command_arm(int param1)
+int Drone::command_arm(int param1, bool force)
 {
     //Message buffer
     mavlink_message_t message;
@@ -257,7 +257,7 @@ int Drone::command_arm(int param1)
     command.command = MAV_CMD_COMPONENT_ARM_DISARM;
     command.confirmation = false;
     command.param1 = param1;
-    command.param2 = 21196;     //21196;  Force Arm/disarm  0
+    command.param2 = force ? 21196 : 0;     //21196;  Force Arm/disarm  0
 
     mavlink_msg_command_long_encode(255, 1, &message, &command);
 
@@ -649,15 +649,6 @@ int Drone::command_right(float param1)
 
     mavlink_msg_command_long_encode(255, 1, &message, &command);
 
-    if (param1 > 0)
-    {
-        //Display_IHM::getInstanceOf().printLog("ARMING");
-    }    
-else
-    {
-        //Display_IHM::getInstanceOf().printLog("STOP ARMING");
-    }
-
     return write_message(message);
 }
 
@@ -678,14 +669,6 @@ int Drone::command_kill(int param1)
     command.param1 = param1;
 
     mavlink_msg_command_long_encode(255, 1, &message, &command);
-    if (param1 > 0)
-    {
-        //Display_IHM::getInstanceOf().printLog("KILL MODE");
-    }    
-else
-    {
-        //Display_IHM::getInstanceOf().printLog("OUT KILL MODE");
-    }
 
     return write_message(message);
 }

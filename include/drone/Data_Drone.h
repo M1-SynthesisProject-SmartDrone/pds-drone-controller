@@ -272,7 +272,7 @@ public:
 	int command_setMode(Drone_mode my_mode);
 
 
-	int command_arm(int param1);
+	int command_arm(int param1, bool force = true);
 
 	//int command_float(int param1);
 

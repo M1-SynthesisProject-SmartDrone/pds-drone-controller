@@ -42,6 +42,10 @@ void initDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
         ss << "Cannot init parameters : " << strerror(errno);
         throw runtime_error(ss.str());
     }
+    // TODO : create messages to handle this in a better way
+    // If GPS enabled
+    // drone->setMode_manual();
+    // If GPS disabled
     drone->setMode_position();
     usleep(1000 * 10); // 10ms
 

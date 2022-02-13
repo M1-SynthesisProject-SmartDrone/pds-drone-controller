@@ -15,8 +15,7 @@ DroneReceiver_ThreadClass::DroneReceiver_ThreadClass(std::shared_ptr<Drone> dron
 }
 
 DroneReceiver_ThreadClass::~DroneReceiver_ThreadClass()
-{
-}
+{}
 
 void DroneReceiver_ThreadClass::run()
 {
@@ -24,7 +23,8 @@ void DroneReceiver_ThreadClass::run()
     LOG_F(INFO, "Start Drone receiver thread class");
     // string buffer1 = "";
 
-    while (isRunFlag()) {
+    while (isRunFlag())
+    {
         usleep(task_period);
 
         currentState = LifeCoreState::RUN;
@@ -36,42 +36,70 @@ void DroneReceiver_ThreadClass::run()
             // ? Add a timestamp check ?
             switch (mavlinkMessage.msgid)
             {
+            case MAVLINK_MSG_ID_HEARTBEAT:
+            {
+                mavlink_heartbeat_t heartbeat;
+                mavlink_msg_heartbeat_decode(&mavlinkMessage, &heartbeat);
+
+                // We have a lot of messages types that we could handle, but only the arm state is important here
+                if (heartbeat.type == MAV_TYPE_QUADROTOR) // Check if it has a chance to be our drone
+                {
+                    // If drone is armed, this flag must be set
+                    bool isArmed = (heartbeat.base_mode & MAV_MODE_FLAG_SAFETY_ARMED) != 0;
+                    if (isArmed != (m_drone->motors == ARM))
+                    {
+                        LOG_F(INFO, "Drone motor state changed : Arm is now equals to %s", isArmed ? "true" : "false");
+                        m_drone->motors = isArmed ? ARM : UNARM;
+                        // TODO : send a message to app if unarmed ?
+                    }
+                }
+                break;
+            }
             case MAVLINK_MSG_ID_ALTITUDE:
+            {
                 mavlink_altitude_t altitude;
                 mavlink_msg_altitude_decode(&mavlinkMessage, &altitude);
                 updateDroneData(altitude);
                 // printf("altitude_local  %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
                 break;
-
+            }
             case MAVLINK_MSG_ID_COMMAND_ACK:
+            {
                 mavlink_command_ack_t commandAck;
                 mavlink_msg_command_ack_decode(&mavlinkMessage, &commandAck);
                 updateDroneData(commandAck);
                 break;
-
+            }
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+            {
                 mavlink_global_position_int_t global_position_int;
                 mavlink_msg_global_position_int_decode(&mavlinkMessage, &global_position_int);
                 updateDroneData(global_position_int);
                 break;
+            }
 
             case MAVLINK_MSG_ID_SCALED_IMU:
+            {
                 mavlink_raw_imu_t scaled_imu;
                 mavlink_msg_raw_imu_decode(&mavlinkMessage, &scaled_imu);
                 updateDroneData(scaled_imu);
                 break;
-
+            }
             case MAVLINK_MSG_ID_HIGHRES_IMU:
+            {
                 mavlink_highres_imu_t highres_imu;
                 mavlink_msg_highres_imu_decode(&mavlinkMessage, &highres_imu);
                 updateDroneData(highres_imu);
                 break;
+            }
 
             case MAVLINK_MSG_ID_BATTERY_STATUS:
+            {
                 mavlink_battery_status_t battery_status;
                 mavlink_msg_battery_status_decode(&mavlinkMessage, &battery_status);
                 updateDroneData(battery_status);
                 break;
+            }
             default:
                 // LOG_F(INFO, "Unknown message id");
                 break;
@@ -95,9 +123,9 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
 
     bool isResultAccepted = commandAck.result == MAV_RESULT_ACCEPTED;
     // Multiple sub commands to handle (change drone data + send messages to app)
-    switch (commandAck.command) 
+    switch (commandAck.command)
     {
-    // If arm / unarm, change the motor state
+        // If arm / unarm, change the motor state
     case MAV_CMD_COMPONENT_ARM_DISARM:
         if (commandAck.result == MAV_RESULT_ACCEPTED)
         {
