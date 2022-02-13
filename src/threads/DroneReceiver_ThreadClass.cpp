@@ -190,7 +190,13 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_altitude_t altitude)
 
 void DroneReceiver_ThreadClass::updateDroneData(mavlink_global_position_int_t globalPosition)
 {
-    string buffer1 = "\nGPS: " + std::to_string(globalPosition.lat) + " " + std::to_string(globalPosition.lon) + " " + std::to_string(globalPosition.alt) + "\n";
+    string buffer1 = "global_position : [lat:" + to_string(globalPosition.lat)
+        + " lon: " + to_string(globalPosition.lon)
+        + " alt: " + to_string(globalPosition.alt)
+        + " alt_rel: " + to_string(globalPosition.relative_alt)
+        + " v(x,y,z): (" + to_string(globalPosition.vx) + "," + to_string(globalPosition.vy) + "," + to_string(globalPosition.vz) + ")"
+        + " hdg: " + to_string(globalPosition.hdg) 
+        + "]";
     // cout << buffer1 << endl;
     m_drone->global_position_int = globalPosition;
 }
