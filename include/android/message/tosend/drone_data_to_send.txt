@@ -1,6 +1,0 @@
-
-We want :
-    Battery status check
-    GPS position check 
-    Gyroscope & Mag pas besoin directement
-    altitude (laquelle : altitude_relative ou altitude_amsl (sea level)) check

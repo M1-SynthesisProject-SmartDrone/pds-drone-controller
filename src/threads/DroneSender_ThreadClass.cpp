@@ -51,6 +51,31 @@ void DroneSender_ThreadClass::run()
     LOG_F(INFO, "End of thread");
 }
 
+void DroneSender_ThreadClass::handleStartMessage(Start_MessageReceived* startMessage)
+{
+    LOG_F(INFO, "Send arming command");
+    if (startMessage->startDrone)
+    {
+        if (m_drone->motors == Drone_Motors::ARM)
+        {
+            LOG_F(INFO, "Start : Drone motors already in wanted state");
+            // Technically this is already done, so the operation is a success
+            auto toSend = make_unique<Answer_MessageToSend>("START_DRONE", true, "Drone already armed");
+            m_appMessagesHolder->add(move(toSend));
+        }
+        else
+        {
+            m_drone->command_directControl(0, 0, 0, 0);
+            m_drone->command_arm(1);
+        }
+    }
+    else
+    {
+        auto toSend = make_unique<Answer_MessageToSend>("START_DRONE", false, "Start drone does not accept false value (useless)");
+        m_appMessagesHolder->add(move(toSend));
+    }
+}
+
 void DroneSender_ThreadClass::handleArmMessage(Arm_MessageReceived* armMessage)
 {
     // we probably want to make some verfications here
@@ -111,6 +136,12 @@ void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage*
 {
     switch (androidMessage->messageType)
     {
+    case MESSAGE_TYPE::START_COMMAND:
+    {
+        Start_MessageReceived* startMessageReceived = static_cast<Start_MessageReceived*>(androidMessage);
+        handleStartMessage(startMessageReceived);
+    }
+    break;
     case MESSAGE_TYPE::ARM_COMMAND:
         // * Brackets are made to avoid cross initialization error (var defined in all scopes)
         // see : https://stackoverflow.com/questions/11578936/getting-a-bunch-of-crosses-initialization-error#answer-11578973

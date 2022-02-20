@@ -25,7 +25,7 @@ void DroneReceiver_ThreadClass::run()
 
     while (isRunFlag())
     {
-        usleep(task_period);
+        // usleep(task_period);
 
         currentState = LifeCoreState::RUN;
         mavlink_message_t mavlinkMessage;
@@ -40,19 +40,7 @@ void DroneReceiver_ThreadClass::run()
             {
                 mavlink_heartbeat_t heartbeat;
                 mavlink_msg_heartbeat_decode(&mavlinkMessage, &heartbeat);
-
-                // We have a lot of messages types that we could handle, but only the arm state is important here
-                if (heartbeat.type == MAV_TYPE_QUADROTOR) // Check if it has a chance to be our drone
-                {
-                    // If drone is armed, this flag must be set
-                    bool isArmed = (heartbeat.base_mode & MAV_MODE_FLAG_SAFETY_ARMED) != 0;
-                    if (isArmed != (m_drone->motors == ARM))
-                    {
-                        LOG_F(INFO, "Drone motor state changed : Arm is now equals to %s", isArmed ? "true" : "false");
-                        m_drone->motors = isArmed ? ARM : UNARM;
-                        // TODO : send a message to app if unarmed ?
-                    }
-                }
+                updateDroneData(heartbeat);
                 break;
             }
             case MAVLINK_MSG_ID_ALTITUDE:
@@ -107,6 +95,23 @@ void DroneReceiver_ThreadClass::run()
 
 
         }
+    }
+}
+
+void DroneReceiver_ThreadClass::updateDroneData(mavlink_heartbeat_t heartbeat)
+{
+    // We have a lot of messages types that we could handle, but only the arm state is important here
+    if (heartbeat.type == MAV_TYPE_QUADROTOR) // Check if it has a chance to be our drone
+    {
+        // If drone is armed, this flag must be set
+        bool isArmed = (heartbeat.base_mode & MAV_MODE_FLAG_SAFETY_ARMED) != 0;
+        if (isArmed != (m_drone->motors == ARM))
+        {
+            LOG_F(INFO, "Drone motor state changed : Arm is now equals to %s", isArmed ? "true" : "false");
+            m_drone->motors = isArmed ? ARM : UNARM;
+        }
+        auto toSend = make_unique<DroneStatus_MessageToSend>(isArmed);
+        m_appMessagesHolder->add(move(toSend));
     }
 }
 

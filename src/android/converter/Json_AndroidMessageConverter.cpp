@@ -138,14 +138,20 @@ TakeOff_MessageReceived* Json_AndroidMessageConverter::tryParseTakeOffCommand(Ge
     };
 }
 
-Document Json_AndroidMessageConverter::convertAnswerMessage(Answer_MessageToSend* answer)
+Document createBaseDocument(string messageType)
 {
     Document document;
     document.SetObject();
 
     Document::AllocatorType& allocator = document.GetAllocator();
-    size_t sz = allocator.Size();
-    document.AddMember("type", "ANSWER", allocator);
+    document.AddMember("type", messageType, allocator);
+    return document;
+}
+
+Document Json_AndroidMessageConverter::convertAnswerMessage(Answer_MessageToSend* answer)
+{
+    Document document = createBaseDocument("ANSWER");
+    Document::AllocatorType& allocator = document.GetAllocator();
     Value content(kObjectType);
     {
         content.AddMember("name", StringRef(answer->name.c_str()), allocator);
@@ -159,12 +165,8 @@ Document Json_AndroidMessageConverter::convertAnswerMessage(Answer_MessageToSend
 
 Document Json_AndroidMessageConverter::convertDroneUpdateMessage(DroneData_MessageToSend* droneData)
 {
-    Document document;
-    document.SetObject();
-
+    Document document = createBaseDocument("DRONE_DATA");
     Document::AllocatorType& allocator = document.GetAllocator();
-    size_t sz = allocator.Size();
-    document.AddMember("type", "DRONE_DATA", allocator);
     Value content(kObjectType);
     {
         content.AddMember("batteryRemaining", droneData->batteryRemaining, allocator);
@@ -176,6 +178,19 @@ Document Json_AndroidMessageConverter::convertDroneUpdateMessage(DroneData_Messa
         content.AddMember("vy", droneData->vy, allocator);
         content.AddMember("vz", droneData->vz, allocator);
         content.AddMember("yawRotation", droneData->yawRotation, allocator);
+    }
+    document.AddMember("content", content, allocator);
+
+    return document;
+}
+
+Document convertDroneStatusMessage(DroneStatus_MessageToSend* droneStatus)
+{
+    Document document = createBaseDocument("DRONE_STATUS");
+    Document::AllocatorType& allocator = document.GetAllocator();
+    Value content(kObjectType);
+    {
+        content.AddMember("isArmed", droneStatus->isArmed, allocator);
     }
     document.AddMember("content", content, allocator);
 

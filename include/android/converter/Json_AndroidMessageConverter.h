@@ -28,6 +28,7 @@
 
 #include "android/message/tosend/Abstract_AndroidToSendMessage.h"
 #include "android/message/tosend/DroneData_MessageToSend.h"
+#include "android/message/tosend/DroneStatus_MessageToSend.h"
 #include "android/message/tosend/Answer_MessageToSend.h"
 
 
@@ -50,6 +51,7 @@ private:
 
     // Convert to send message
     rapidjson::Document convertDroneUpdateMessage(DroneData_MessageToSend* droneData);
+    rapidjson::Document convertDroneStatusMessage(DroneStatus_MessageToSend* droneStatus);
     rapidjson::Document convertAnswerMessage(Answer_MessageToSend* answer);
 };
 

@@ -1,0 +1,6 @@
+Scénario :
+    - L'utilisateur clique sur un bouton "record"
+    - Le drone est en train de voler et d'envoyer ses coordonnées GPS périodiquement
+    - On enregistre toutes les X secondes dans un fichier (format csv, plus propice à ce genre de sauvegarde)
+    - L'utilisateur clique sur "End record"
+    - On lance un programme à part pour aller sauvegarder les données en BDD
