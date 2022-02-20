@@ -25,6 +25,8 @@
 #include "android/message/received/Arm_MessageReceived.h"
 #include "android/message/received/TakeOff_MessageReceived.h"
 #include "android/message/received/Manual_MessageReceived.h"
+#include "android/message/received/Start_MessageReceived.h"
+#include "android/message/received/Record_MessageReceived.h"
 
 #include "android/message/tosend/Abstract_AndroidToSendMessage.h"
 #include "android/message/tosend/DroneData_MessageToSend.h"
@@ -45,6 +47,8 @@ private:
     MESSAGE_TYPE findMessageType(rapidjson::Document& doc);
 
     // Convert recevied message
+    Start_MessageReceived* tryParseStartCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
+    Record_MessageReceived* tryParseRecordCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
     Manual_MessageReceived* tryParseManualCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
     Arm_MessageReceived* tryParseArmCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
     TakeOff_MessageReceived* tryParseTakeOffCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);

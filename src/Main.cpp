@@ -2,6 +2,8 @@
 #include <errno.h>
 #include <thread>
 #include <vector>
+#include <random>
+#include <time>
 #include <stdexcept>
 #include <stdlib.h>
 #include <sstream>
@@ -26,6 +28,7 @@ const short DRONE_TIMEOUT_LIMIT = 10000;
 
 void initDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
 {
+    srand(time(0));
     LOG_F(INFO, "Try connecting to drone on %s with baudrate %d", serialPath, serialBaudrate);
     drone.get()->open(serialPath, serialBaudrate);
     if (drone->init_communication() != 0)

@@ -14,7 +14,7 @@ struct Start_MessageReceived : Abstract_AndroidReceivedMessage
 
     Start_MessageReceived(bool startDrone)
     {
-        this->messageType = MESSAGE_TYPE::ARM_COMMAND;
+        this->messageType = MESSAGE_TYPE::START_COMMAND;
         this->startDrone = startDrone;
     }
 

@@ -27,6 +27,8 @@ private:
     // Methods
     std::unique_ptr<Abstract_AndroidReceivedMessage> receiveMessage();
 
+    const int BUFFER_SIZE = 1024;
+
 public:
     AndroidReceiver_ThreadClass(std::shared_ptr<AndroidUDPSocket> AndroidUDPSocket,
         std::shared_ptr<ToDroneMessagesHolder> messageHolder,

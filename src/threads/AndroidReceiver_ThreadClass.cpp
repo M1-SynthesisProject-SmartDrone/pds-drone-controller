@@ -42,9 +42,9 @@ void AndroidReceiver_ThreadClass::run()
 std::unique_ptr<Abstract_AndroidReceivedMessage> AndroidReceiver_ThreadClass::receiveMessage()
 {
     // Must be a too big buffer to work with
-    char buffer[512];
-    int bytesRead = m_UDPSocket->receiveAndSaveSender(buffer, 512);
-    if (bytesRead > 512)
+    char buffer[BUFFER_SIZE];
+    int bytesRead = m_UDPSocket->receiveAndSaveSender(buffer, BUFFER_SIZE);
+    if (bytesRead >= BUFFER_SIZE)
     {
         LOG_F(ERROR, "Received bigger message than buffer could handle, message truncated");
     }

@@ -85,14 +85,21 @@ string Json_AndroidMessageConverter::convertToSendMessage(Abstract_AndroidToSend
     }
 }
 
-
 MESSAGE_TYPE Json_AndroidMessageConverter::findMessageType(Document& doc)
 {
     if (doc.HasMember("type"))
     {
         const char* type = doc["type"].GetString();
         // if comparison slow, we may use hases here
-        if (strcmp(type, "ARM") == 0)
+        if (strcmp(type, "MANUAL_CONTROL") == 0)
+        {
+            return MESSAGE_TYPE::MANUAL_CONTROL;
+        }
+        else if (strcmp(type, "START") == 0)
+        {
+            return MESSAGE_TYPE::START_COMMAND;
+        }
+        else if (strcmp(type, "ARM") == 0)
         {
             return MESSAGE_TYPE::ARM_COMMAND;
         }
@@ -100,14 +107,12 @@ MESSAGE_TYPE Json_AndroidMessageConverter::findMessageType(Document& doc)
         {
             return MESSAGE_TYPE::TAKE_OFF;
         }
-        else if (strcmp(type, "MANUAL_CONTROL") == 0)
-        {
-            return MESSAGE_TYPE::MANUAL_CONTROL;
-        }
     }
     return MESSAGE_TYPE::UNKNOWN;
 }
 
+// ==== SPECIFIC MESSAGES ====
+// ---- Received ----
 Manual_MessageReceived* Json_AndroidMessageConverter::tryParseManualCommand(GenericObject<false, Value>& obj)
 {
     double leftMove = obj["y"].GetDouble();
@@ -119,6 +124,22 @@ Manual_MessageReceived* Json_AndroidMessageConverter::tryParseManualCommand(Gene
         leftRotation,
         forwardMove,
         motorPower
+    };
+}
+
+Start_MessageReceived* Json_AndroidMessageConverter::tryParseStartCommand(GenericObject<false, Value>& obj)
+{
+    bool start = obj["startDrone"].GetBool();
+    return new Start_MessageReceived{
+        start
+    };
+}
+
+Record_MessageReceived* Json_AndroidMessageConverter::tryParseRecordCommand(GenericObject<false, Value>& obj)
+{
+    bool record = obj["record"].GetBool();
+    return new Record_MessageReceived{
+        record
     };
 }
 
@@ -138,6 +159,7 @@ TakeOff_MessageReceived* Json_AndroidMessageConverter::tryParseTakeOffCommand(Ge
     };
 }
 
+// ---- To Send ----
 Document createBaseDocument(string messageType)
 {
     Document document;

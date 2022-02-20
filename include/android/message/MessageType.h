@@ -1,11 +1,11 @@
 #ifndef __MESSAGETYPE_H__
 #define __MESSAGETYPE_H__
 
-
 typedef enum {
     // RECEIVED MESSAGE TYPES
     ARM_COMMAND,
     MANUAL_CONTROL,
+    RECORD,
     START_COMMAND,
     TAKE_OFF,
     // TO SEND MESSAGE TYPES

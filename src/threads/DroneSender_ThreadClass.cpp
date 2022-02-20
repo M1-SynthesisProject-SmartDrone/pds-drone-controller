@@ -132,13 +132,26 @@ void DroneSender_ThreadClass::handleManualControlMessage(Manual_MessageReceived*
     );
 }
 
+void DroneSender_ThreadClass::handleRecordMessage(Record_MessageReceived* recordMessage)
+{
+    bool record = recordMessage->record;
+    if (record)
+    {
+        // if (m_drone->motors == Drone_Motors::ARM)
+    }
+    else
+    {
+
+    }
+}
+
 void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage* androidMessage)
 {
     switch (androidMessage->messageType)
     {
     case MESSAGE_TYPE::START_COMMAND:
     {
-        Start_MessageReceived* startMessageReceived = static_cast<Start_MessageReceived*>(androidMessage);
+        auto startMessageReceived = static_cast<Start_MessageReceived*>(androidMessage);
         handleStartMessage(startMessageReceived);
     }
     break;
@@ -146,14 +159,20 @@ void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage*
         // * Brackets are made to avoid cross initialization error (var defined in all scopes)
         // see : https://stackoverflow.com/questions/11578936/getting-a-bunch-of-crosses-initialization-error#answer-11578973
     {
-        Arm_MessageReceived* armMessage = static_cast<Arm_MessageReceived*>(androidMessage);
+        auto armMessage = static_cast<Arm_MessageReceived*>(androidMessage);
         handleArmMessage(armMessage);
     }
     break;
     case MESSAGE_TYPE::MANUAL_CONTROL:
     {
-        Manual_MessageReceived* manualMessage = static_cast<Manual_MessageReceived*>(androidMessage);
+        auto manualMessage = static_cast<Manual_MessageReceived*>(androidMessage);
         handleManualControlMessage(manualMessage);
+    }
+    break;
+    case MESSAGE_TYPE::RECORD:
+    {
+        auto recordMessage = static_cast<Record_MessageReceived*>(androidMessage);
+
     }
     break;
     case MESSAGE_TYPE::TAKE_OFF:
