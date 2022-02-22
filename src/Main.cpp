@@ -3,7 +3,6 @@
 #include <thread>
 #include <vector>
 #include <random>
-#include <time>
 #include <stdexcept>
 #include <stdlib.h>
 #include <sstream>
@@ -23,7 +22,7 @@
 
 using namespace std;
 
-const short ANDROID_UDP_PORT = 6969;
+const short ANDROID_UDP_PORT = 6869;
 const short DRONE_TIMEOUT_LIMIT = 10000;
 
 void initDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
@@ -67,7 +66,8 @@ int main(int argc, char* argv[])
         ("b,baudrate", "The baudrate to communicate with drone", cxxopts::value<int>()->default_value("57600"))
         ("s,serial", "The path on which communicate with drone", cxxopts::value<string>()->default_value("/dev/ttyUSB0"))
         ("p,port", "The port on which to listen the android application", cxxopts::value<uint16_t>()->default_value(to_string(ANDROID_UDP_PORT)))
-        ("n,no_drone", "If this option is enabled, the app will not try to connect to the drone", cxxopts::value<bool>()->default_value("false"));
+        ("n,no_drone", "If this option is enabled, the app will not try to connect to the drone", cxxopts::value<bool>()->default_value("false"))
+        ("f,folder_path", "Represent the folder where to put generated files", cxxopts::value<string>()->default_value("~/smart_drone_temp"));
 
     auto optionsParsed = options.parse(argc, argv);
 
@@ -75,12 +75,14 @@ int main(int argc, char* argv[])
     string serialPath = optionsParsed["serial"].as<string>();
     uint16_t androidPort = optionsParsed["port"].as<uint16_t>();
     bool useDrone = !optionsParsed["no_drone"].as<bool>();
+    string folderPath = optionsParsed["folder_path"].as<string>();
 
     auto drone = make_shared<Drone>();
     auto toDroneMessagesHolder = make_shared<ToDroneMessagesHolder>();
     auto toAppMessagesHolder = make_shared<ToAppMessagesHolder>();
     auto androidUdpSocket = make_shared<AndroidUDPSocket>(androidPort);
     auto messageConverter = make_shared<Json_AndroidMessageConverter>();
+    auto pathRecorderHandler = make_shared<PathRecorderHandler>(folderPath);
 
     if (useDrone)
     {
@@ -103,12 +105,31 @@ int main(int argc, char* argv[])
 
     // The list of threads used by the app
     vector<unique_ptr<Abstract_ThreadClass>> threads;
-    threads.push_back(make_unique<AndroidReceiver_ThreadClass>(androidUdpSocket, toDroneMessagesHolder, messageConverter));
-    threads.push_back(make_unique<AndroidSender_ThreadClass>(drone, androidUdpSocket, toAppMessagesHolder, messageConverter));
+    threads.push_back(
+        make_unique<AndroidReceiver_ThreadClass>(
+            androidUdpSocket,
+            pathRecorderHandler,
+            toAppMessagesHolder,
+            toDroneMessagesHolder, 
+            messageConverter));
+    threads.push_back(
+        make_unique<AndroidSender_ThreadClass>(
+            drone, 
+            androidUdpSocket, 
+            toAppMessagesHolder, 
+            messageConverter));
     if (useDrone)
     {
-        threads.push_back(make_unique<DroneSender_ThreadClass>(drone, toDroneMessagesHolder, toAppMessagesHolder));
-        threads.push_back(make_unique<DroneReceiver_ThreadClass>(drone, toAppMessagesHolder));
+        threads.push_back(
+            make_unique<DroneSender_ThreadClass>(
+                drone, 
+                toDroneMessagesHolder, 
+                toAppMessagesHolder));
+        threads.push_back(
+            make_unique<DroneReceiver_ThreadClass>(
+                drone,
+                pathRecorderHandler,
+                toAppMessagesHolder));
     }
 
     // start all threads

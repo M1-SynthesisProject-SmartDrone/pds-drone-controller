@@ -3,6 +3,7 @@
 
 typedef enum {
     // RECEIVED MESSAGE TYPES
+    ACKNOWLEDGEMENT,
     ARM_COMMAND,
     MANUAL_CONTROL,
     RECORD,

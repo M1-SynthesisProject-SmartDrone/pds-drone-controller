@@ -17,6 +17,7 @@
 #include "global_variables.h"
 #include "drone/Data_Drone.h"
 #include "threads/bridges/ToAppMessagesHolder.h"
+#include "threads/bridges/PathRecorderHandler.h"
 #include "android/message/tosend/Answer_MessageToSend.h"
 #include "android/message/tosend/DroneStatus_MessageToSend.h"
 
@@ -25,17 +26,21 @@ class DroneReceiver_ThreadClass : public Abstract_ThreadClass
 private:
     std::shared_ptr<Drone> m_drone;
     std::shared_ptr<ToAppMessagesHolder> m_appMessagesHolder;
+    std::shared_ptr<PathRecorderHandler> m_pathRecorder;
 
-    void updateDroneData(mavlink_heartbeat_t heartbeat);
-    void updateDroneData(mavlink_altitude_t altitude);
-    void updateDroneData(mavlink_command_ack_t commandAck);
-    void updateDroneData(mavlink_global_position_int_t globalPosition);
-    void updateDroneData(mavlink_raw_imu_t rawImu);
-    void updateDroneData(mavlink_highres_imu_t highresImu);
-    void updateDroneData(mavlink_battery_status_t batteryStatus);
+    void handleHeartbeat(mavlink_heartbeat_t heartbeat);
+    void handleAltitude(mavlink_altitude_t altitude);
+    void handleAck(mavlink_command_ack_t commandAck);
+    void handleGlobalPosition(mavlink_global_position_int_t globalPosition);
+    void handleRawImu(mavlink_raw_imu_t rawImu);
+    void handleHighresImu(mavlink_highres_imu_t highresImu);
+    void handleBatteryStatus(mavlink_battery_status_t batteryStatus);
 
 public:
-    DroneReceiver_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ToAppMessagesHolder> appMessagesHolder);
+    DroneReceiver_ThreadClass(
+        std::shared_ptr<Drone> drone,
+        std::shared_ptr<PathRecorderHandler> pathRecorderHandler,
+        std::shared_ptr<ToAppMessagesHolder> appMessagesHolder);
     ~DroneReceiver_ThreadClass();
 
     void run();

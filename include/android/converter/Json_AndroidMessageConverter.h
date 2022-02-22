@@ -23,6 +23,7 @@
 #include "android/message/MessageType.h"
 #include "android/message/received/Manual_MessageReceived.h"
 #include "android/message/received/Arm_MessageReceived.h"
+#include "android/message/received/Ack_MessageReceived.h"
 #include "android/message/received/TakeOff_MessageReceived.h"
 #include "android/message/received/Manual_MessageReceived.h"
 #include "android/message/received/Start_MessageReceived.h"
@@ -47,6 +48,7 @@ private:
     MESSAGE_TYPE findMessageType(rapidjson::Document& doc);
 
     // Convert recevied message
+    Ack_MessageReceived* tryParseAckCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
     Start_MessageReceived* tryParseStartCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
     Record_MessageReceived* tryParseRecordCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
     Manual_MessageReceived* tryParseManualCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);

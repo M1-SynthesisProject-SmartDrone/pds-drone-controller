@@ -127,6 +127,12 @@ Manual_MessageReceived* Json_AndroidMessageConverter::tryParseManualCommand(Gene
     };
 }
 
+Ack_MessageReceived* Json_AndroidMessageConverter::tryParseAckCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj)
+{
+    return new Ack_MessageReceived();
+}
+
+
 Start_MessageReceived* Json_AndroidMessageConverter::tryParseStartCommand(GenericObject<false, Value>& obj)
 {
     bool start = obj["startDrone"].GetBool();
@@ -164,9 +170,10 @@ Document createBaseDocument(string messageType)
 {
     Document document;
     document.SetObject();
+    rapidjson::GenericStringRef<char> value(messageType.c_str());
 
     Document::AllocatorType& allocator = document.GetAllocator();
-    document.AddMember("type", messageType, allocator);
+    document.AddMember("type", value, allocator);
     return document;
 }
 

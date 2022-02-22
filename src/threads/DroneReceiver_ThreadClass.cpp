@@ -4,14 +4,19 @@
  */
 #include "threads/DroneReceiver_ThreadClass.h"
 
+// #define DEBUG_CMD
+
 using namespace std;
 
-
-DroneReceiver_ThreadClass::DroneReceiver_ThreadClass(std::shared_ptr<Drone> drone, std::shared_ptr<ToAppMessagesHolder> appMessagesHolder)
+DroneReceiver_ThreadClass::DroneReceiver_ThreadClass(
+    std::shared_ptr<Drone> drone,
+    std::shared_ptr<PathRecorderHandler> pathRecorderHandler,
+    std::shared_ptr<ToAppMessagesHolder> appMessagesHolder)
     : Abstract_ThreadClass(1000, 200)
 {
     m_drone = drone;
     m_appMessagesHolder = appMessagesHolder;
+    m_pathRecorder = pathRecorderHandler;
 }
 
 DroneReceiver_ThreadClass::~DroneReceiver_ThreadClass()
@@ -26,7 +31,6 @@ void DroneReceiver_ThreadClass::run()
     while (isRunFlag())
     {
         // usleep(task_period);
-
         currentState = LifeCoreState::RUN;
         mavlink_message_t mavlinkMessage;
         if (m_drone->read_message(mavlinkMessage))
@@ -40,14 +44,14 @@ void DroneReceiver_ThreadClass::run()
             {
                 mavlink_heartbeat_t heartbeat;
                 mavlink_msg_heartbeat_decode(&mavlinkMessage, &heartbeat);
-                updateDroneData(heartbeat);
+                handleHeartbeat(heartbeat);
                 break;
             }
             case MAVLINK_MSG_ID_ALTITUDE:
             {
                 mavlink_altitude_t altitude;
                 mavlink_msg_altitude_decode(&mavlinkMessage, &altitude);
-                updateDroneData(altitude);
+                handleAltitude(altitude);
                 // printf("altitude_local  %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
                 break;
             }
@@ -55,14 +59,14 @@ void DroneReceiver_ThreadClass::run()
             {
                 mavlink_command_ack_t commandAck;
                 mavlink_msg_command_ack_decode(&mavlinkMessage, &commandAck);
-                updateDroneData(commandAck);
+                handleAck(commandAck);
                 break;
             }
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
             {
                 mavlink_global_position_int_t global_position_int;
                 mavlink_msg_global_position_int_decode(&mavlinkMessage, &global_position_int);
-                updateDroneData(global_position_int);
+                handleGlobalPosition(global_position_int);
                 break;
             }
 
@@ -70,14 +74,14 @@ void DroneReceiver_ThreadClass::run()
             {
                 mavlink_raw_imu_t scaled_imu;
                 mavlink_msg_raw_imu_decode(&mavlinkMessage, &scaled_imu);
-                updateDroneData(scaled_imu);
+                handleRawImu(scaled_imu);
                 break;
             }
             case MAVLINK_MSG_ID_HIGHRES_IMU:
             {
                 mavlink_highres_imu_t highres_imu;
                 mavlink_msg_highres_imu_decode(&mavlinkMessage, &highres_imu);
-                updateDroneData(highres_imu);
+                handleHighresImu(highres_imu);
                 break;
             }
 
@@ -85,20 +89,18 @@ void DroneReceiver_ThreadClass::run()
             {
                 mavlink_battery_status_t battery_status;
                 mavlink_msg_battery_status_decode(&mavlinkMessage, &battery_status);
-                updateDroneData(battery_status);
+                handleBatteryStatus(battery_status);
                 break;
             }
             default:
                 // LOG_F(INFO, "Unknown message id");
                 break;
             }
-
-
         }
     }
 }
 
-void DroneReceiver_ThreadClass::updateDroneData(mavlink_heartbeat_t heartbeat)
+void DroneReceiver_ThreadClass::handleHeartbeat(mavlink_heartbeat_t heartbeat)
 {
     // We have a lot of messages types that we could handle, but only the arm state is important here
     if (heartbeat.type == MAV_TYPE_QUADROTOR) // Check if it has a chance to be our drone
@@ -115,14 +117,16 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_heartbeat_t heartbeat)
     }
 }
 
-void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck)
+void DroneReceiver_ThreadClass::handleAck(mavlink_command_ack_t commandAck)
 {
+#ifdef DEBUG_CMD
     string buffer;
     buffer = " Command :" + std::to_string(m_drone->ack.command) + "\n";
     buffer = buffer + " result: " + std::to_string(m_drone->ack.result);
     buffer = buffer + " result_param2: " + std::to_string(m_drone->ack.result_param2) + "\n";
     buffer = buffer + " progress: " + std::to_string(m_drone->ack.progress) + "\n";
     cout << buffer << endl;
+#endif
 
     m_drone->ack = commandAck;
 
@@ -140,13 +144,13 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
             {
                 m_drone->tookOff = false;
             }
-            auto toSend = make_unique<Answer_MessageToSend>("ARM", true);
+            auto toSend = make_unique<Answer_MessageToSend>("START_DRONE", true);
             m_appMessagesHolder->add(move(toSend));
         }
         else if (commandAck.result != MAV_RESULT_IN_PROGRESS)
         {
             LOG_F(ERROR, "Arm / Disarm : receive error of type %d : result2 = %d", commandAck.result, commandAck.result_param2);
-            auto toSend = make_unique<Answer_MessageToSend>("ARM", false, "The drone send a negative answer");
+            auto toSend = make_unique<Answer_MessageToSend>("START_DRONE", false, "The drone send a negative answer");
             m_appMessagesHolder->add(move(toSend));
         }
         break;
@@ -186,15 +190,22 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_command_ack_t commandAck
     }
 }
 
-void DroneReceiver_ThreadClass::updateDroneData(mavlink_altitude_t altitude)
+void DroneReceiver_ThreadClass::handleAltitude(mavlink_altitude_t altitude)
 {
-    // printf("Altitude : altitude_local %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", altitude.altitude_local, altitude.altitude_relative, altitude.altitude_terrain, altitude.bottom_clearance);
-
+#ifdef DEBUG_CMD
+    printf("Altitude : altitude_local %f altitude_relative %f altitude_terrain %f  bottom_clearance %f\n", 
+        altitude.altitude_local, 
+        altitude.altitude_relative, 
+        altitude.altitude_terrain,
+        altitude.bottom_clearance
+    );
+#endif
     m_drone->altitude = altitude;
 }
 
-void DroneReceiver_ThreadClass::updateDroneData(mavlink_global_position_int_t globalPosition)
+void DroneReceiver_ThreadClass::handleGlobalPosition(mavlink_global_position_int_t globalPosition)
 {
+#ifdef DEBUG_CMD
     string buffer1 = "global_position : [lat:" + to_string(globalPosition.lat)
         + " lon: " + to_string(globalPosition.lon)
         + " alt: " + to_string(globalPosition.alt)
@@ -202,32 +213,39 @@ void DroneReceiver_ThreadClass::updateDroneData(mavlink_global_position_int_t gl
         + " v(x,y,z): (" + to_string(globalPosition.vx) + "," + to_string(globalPosition.vy) + "," + to_string(globalPosition.vz) + ")"
         + " hdg: " + to_string(globalPosition.hdg) 
         + "]";
-    // cout << buffer1 << endl;
+    cout << buffer1 << endl;
+#endif
     m_drone->global_position_int = globalPosition;
+    m_pathRecorder->insertData(globalPosition.lat, globalPosition.lon, globalPosition.alt);
 }
 
-void DroneReceiver_ThreadClass::updateDroneData(mavlink_raw_imu_t rawImu)
+void DroneReceiver_ThreadClass::handleRawImu(mavlink_raw_imu_t rawImu)
 {
     // WARN : we don't store those structs, only for debugging
+#ifdef DEBUG_CMD
     string buffer1 = "mavlink_raw_imu_t : Acc: " + std::to_string(rawImu.xacc) + " " + std::to_string(rawImu.yacc) + " " + std::to_string(rawImu.zacc) + "\n";
     buffer1 = buffer1 + " Gyro: " + std::to_string(rawImu.xgyro) + " " + std::to_string(rawImu.ygyro) + " " + std::to_string(rawImu.zgyro) + "\n";
     buffer1 = buffer1 + " Mag: " + std::to_string(rawImu.xmag) + " " + std::to_string(rawImu.ymag) + " " + std::to_string(rawImu.zmag) + "\n";
-    // cout << buffer1 << endl;
+    cout << buffer1 << endl;
+#endif
 }
 
-void DroneReceiver_ThreadClass::updateDroneData(mavlink_highres_imu_t highresImu)
+void DroneReceiver_ThreadClass::handleHighresImu(mavlink_highres_imu_t highresImu)
 {
-
+#ifdef DEBUG_CMD
     string buffer1 = "highres : Acc: " + std::to_string(highresImu.xacc) + " " + std::to_string(highresImu.yacc) + " " + std::to_string(highresImu.zacc) + "\n";
     buffer1 = buffer1 + " Gyro: " + std::to_string(highresImu.xgyro) + " " + std::to_string(highresImu.ygyro) + " " + std::to_string(highresImu.zgyro) + "\n";
     buffer1 = buffer1 + " Mag: " + std::to_string(highresImu.xmag) + " " + std::to_string(highresImu.ymag) + " " + std::to_string(highresImu.zmag) + "\n";
     buffer1 = buffer1 + " Temperature: " + std::to_string(highresImu.temperature) + "\n\n";
     // cout << buffer1 << endl;
     m_drone->highres_imu = highresImu;
+#endif
 }
 
-void DroneReceiver_ThreadClass::updateDroneData(mavlink_battery_status_t batteryStatus)
+void DroneReceiver_ThreadClass::handleBatteryStatus(mavlink_battery_status_t batteryStatus)
 {
-    // printf("Battery status : %d \n", batteryStatus.battery_remaining);
+#ifdef DEBUG_CMD
+    printf("Battery status : %d \n", batteryStatus.battery_remaining);
+#endif
     m_drone->battery_status = batteryStatus;
 }
