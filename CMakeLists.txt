@@ -1,6 +1,5 @@
 # Root Cmake. Use to link the different libraries
 #
-# @author  sylvain Colomer, P. Gaussier
 # @version 1.0
 
 
@@ -43,43 +42,23 @@ message("- Checking : pkg")
 find_package(PkgConfig REQUIRED)
 if(PkgConfig_FOUND)
     message("-> succes " )
-endif()
-
-# message("- Checking : mavlink")
-# if(EXISTS ${CMAKE_SOURCE_DIR}/lib/mavlink)
-#     message("-> succes " )
-# else()
-#     message("Fail: You must install mavlink")
-# endif()
-# set(MAVLINK_LIB -I/lib/mavlink)
-# include_directories(./lib/mavlink)
-
-# message("- Checking : cxxopts")
-# if(EXISTS ${CMAKE_SOURCE_DIR}/lib/cxxopts)
-#     message("-> succes " )
-# else()
-#     message("Fail: You must install cxxopts")
-# endif()
-# set(CXXOPTS_LIB -I/lib/cxxopts)
-# include_directories(./lib/cxxopts)
-
-# message("- Checking : Loguru")
-# if(EXISTS ${CMAKE_SOURCE_DIR}/lib/loguru)
-#    message("-> succes " )
-# else()
-#    message("Fail: You must add loguru log system in lib folder")
-# endif()
-# set(LOGURU_LIB -I/lib/loguru)
-# include_directories(./lib/loguru)
-
-message("- Checking : simdjson")
-if(EXISTS ${CMAKE_SOURCE_DIR}/lib/rapidjson)
-   message("-> succes " )
 else()
-   message("Fail: You must add rapidjson files in lib folder")
+    message("Fail : You must hae PkgConfig installed")
 endif()
-set(RAPIDJSON_LIB -I/lib/rapidjson)
-include_directories(./lib/rapidjson)
+
+# message("- Checking : libconfig")
+# find_package(libconfig++-dev REQUIRED)
+# if(libconfig++-dev_FOUND)
+#     message("-> succes " )
+# else()
+#     message("Fail : You must have libconfig installed")
+#     message("$ sudo apt-get install libconfig++-dev")
+# endif()
+
+find_library(libconfig++ libconfig++)
+
+# include(FindPkgConfig)
+# pkg_check_modules(libconfig++-dev REQUIRED libconf)
 
 message("- Checking : Blc channels")
 find_package(blc_channel REQUIRED)
@@ -109,8 +88,11 @@ link_libraries(
     ${CURSES_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     dl
+    config++
     panel 
 )
+
+# target_link_libraries(SmartDrone config++)
 
 add_subdirectory(lib)
 include_directories(lib)
@@ -131,6 +113,9 @@ file(GLOB_RECURSE drone_SRC
      "src/*.cpp"
 )
 
+# Copy the config file to the bin folder to make it run
+file(COPY config/config.cfg DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
 # %% App files
 add_executable(${APP_NAME} ${drone_SRC})
 
@@ -139,4 +124,5 @@ target_link_libraries(${APP_NAME} PUBLIC
     mavlink
     loguru
     rapidjson
+    -lconfig++
 )

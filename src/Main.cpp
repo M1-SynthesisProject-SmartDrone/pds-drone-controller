@@ -4,11 +4,13 @@
 #include <vector>
 #include <random>
 #include <stdexcept>
+#include <filesystem>
 #include <stdlib.h>
 #include <sstream>
 
 #include <loguru/loguru.hpp>
 #include <cxxopts/cxxopts.hpp>
+#include <libconfig.h++>
 
 #include "threads/Abstract_ThreadClass.h"
 #include "threads/AndroidReceiver_ThreadClass.h"
@@ -22,6 +24,7 @@
 #include "android/message/tosend/Answer_MessageToSend.h"
 
 using namespace std;
+// namespace fs = std::filesystem;
 
 const short ANDROID_UDP_PORT = 6969;
 const short DRONE_TIMEOUT_LIMIT = 10000;
@@ -53,36 +56,44 @@ void initDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
     usleep(1000 * 10); // 10ms
 }
 
+string getConfigPath(char *argv[])
+{
+    std::filesystem::path exePath(argv[0]);
+    std::filesystem::path exeDirectoryPath = exePath.parent_path();
+    return exeDirectoryPath.string() + "/config.cfg";
+}
+
 int main(int argc, char* argv[])
 {
     loguru::init(argc, argv);
     LOG_F(INFO, "Start the 'SmartDroneController' application");
 
-    // Read command line arguments
-    cxxopts::Options options("Test", "Test2");
-    options.add_options()
-        ("b,baudrate", "The baudrate to communicate with drone", cxxopts::value<int>()->default_value("57600"))
-        ("s,serial", "The path on which communicate with drone", cxxopts::value<string>()->default_value("/dev/ttyUSB0"))
-        ("p,port", "The port on which to listen the android application", cxxopts::value<uint16_t>()->default_value(to_string(ANDROID_UDP_PORT)))
-        ("n,no_drone", "If this option is enabled, the app will not try to connect to the drone", cxxopts::value<bool>()->default_value("false"))
-        ("f,folder_path", "Represent the folder where to put generated files", cxxopts::value<string>()->default_value("/home/aldric-vs/smart_drone_temp"))
-        ("e,saver_exe_path", "The saver executable path", cxxopts::value<string>()->default_value("~/pathSaver"));
+    // ==== READ CONFIG FILE ====
+    libconfig::Config config;
+    // The file must be aside the executable normally (done at cmake step)
+    // If there is an issue, we must stop the app anyways, so let the exception throw
+    config.readFile(getConfigPath(argv).c_str());
 
-    auto optionsParsed = options.parse(argc, argv);
+    const libconfig::Setting& root = config.getRoot();
+    string tmpFolderPath = root.lookup("tmp_folder");
 
-    int serialBaudrate = optionsParsed["baudrate"].as<int>();
-    string serialPath = optionsParsed["serial"].as<string>();
-    uint16_t androidPort = optionsParsed["port"].as<uint16_t>();
-    bool useDrone = !optionsParsed["no_drone"].as<bool>();
-    string folderPath = optionsParsed["folder_path"].as<string>();
-    string saverExePath = optionsParsed["saver_exe_path"].as<string>();
+    const libconfig::Setting& droneSettings = root["drone"];
+    int serialBaudrate = droneSettings["baudrate"];
+    string serialPath = droneSettings["serial_path"];
+    bool useDrone = droneSettings["test_connection"];
+    
+    const libconfig::Setting& appSettings = root["app"];
+    int appPort = appSettings["port"];
+
+    const libconfig::Setting& exeSettings = root["exe_paths"];
+    string saverExePath = exeSettings["path_saver"];
 
     auto drone = make_shared<Drone>();
     auto toDroneMessagesHolder = make_shared<ToDroneMessagesHolder>();
     auto toAppMessagesHolder = make_shared<ToAppMessagesHolder>();
-    auto androidUdpSocket = make_shared<AndroidUDPSocket>(androidPort);
+    auto androidUdpSocket = make_shared<AndroidUDPSocket>(appPort);
     auto messageConverter = make_shared<Json_AndroidMessageConverter>();
-    auto pathRecorderHandler = make_shared<PathRecorderHandler>(folderPath);
+    auto pathRecorderHandler = make_shared<PathRecorderHandler>(tmpFolderPath);
     auto processExecutor = make_shared<ProcessExecutor>(saverExePath);
 
     if (useDrone)
@@ -131,6 +142,10 @@ int main(int argc, char* argv[])
                 drone,
                 pathRecorderHandler,
                 toAppMessagesHolder));
+    }
+    else
+    {
+        LOG_F(WARNING, "No connection made to the drone");
     }
 
     // start all threads
