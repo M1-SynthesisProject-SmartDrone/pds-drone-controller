@@ -1,11 +1,21 @@
 
 #include "threads/bridges/PathRecorderHandler.h"
 
+#include <loguru/loguru.hpp>
+
 using namespace std;
 namespace fs = std::filesystem;
 
 PathRecorderHandler::PathRecorderHandler(std::string baseFolderName): m_baseFolderPath(baseFolderName)
-{}
+{
+    // Create baseFolder if not exists
+    LOG_F(INFO, "Check if folder exists at %s", fs::absolute(m_baseFolderPath).c_str());
+    if(!fs::exists(m_baseFolderPath) || !fs::is_directory(m_baseFolderPath))
+    {
+        LOG_F(INFO, "Create path recorder tmp folder");
+        fs::create_directories(m_baseFolderPath);
+    }
+}
 
 PathRecorderHandler::~PathRecorderHandler()
 {}
@@ -43,7 +53,7 @@ std::string PathRecorderHandler::stopRecording()
     m_isRecording = false;
     // Flush automatically remaining data
     m_currentStream.close();
-    return fs::absolute(m_currentFilePath);
+    return fs::absolute(m_currentFilePath).string();
 }
 
 void PathRecorderHandler::insertData(int32_t latitude, int32_t longitude, int32_t altitude)

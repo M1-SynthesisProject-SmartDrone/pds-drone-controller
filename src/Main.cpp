@@ -17,12 +17,13 @@
 #include "threads/DroneReceiver_ThreadClass.h"
 #include "network/Com_Serial.h"
 #include "drone/Data_Drone.h"
+#include "process/ProcessExecutor.h"
 
 #include "android/message/tosend/Answer_MessageToSend.h"
 
 using namespace std;
 
-const short ANDROID_UDP_PORT = 6869;
+const short ANDROID_UDP_PORT = 6969;
 const short DRONE_TIMEOUT_LIMIT = 10000;
 
 void initDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
@@ -50,9 +51,6 @@ void initDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
     // If GPS disabled
     drone->setMode_position();
     usleep(1000 * 10); // 10ms
-
-    // drone->command_arm(1);
-    // usleep(1000 * 10); // 10ms
 }
 
 int main(int argc, char* argv[])
@@ -67,7 +65,8 @@ int main(int argc, char* argv[])
         ("s,serial", "The path on which communicate with drone", cxxopts::value<string>()->default_value("/dev/ttyUSB0"))
         ("p,port", "The port on which to listen the android application", cxxopts::value<uint16_t>()->default_value(to_string(ANDROID_UDP_PORT)))
         ("n,no_drone", "If this option is enabled, the app will not try to connect to the drone", cxxopts::value<bool>()->default_value("false"))
-        ("f,folder_path", "Represent the folder where to put generated files", cxxopts::value<string>()->default_value("~/smart_drone_temp"));
+        ("f,folder_path", "Represent the folder where to put generated files", cxxopts::value<string>()->default_value("/home/aldric-vs/smart_drone_temp"))
+        ("e,saver_exe_path", "The saver executable path", cxxopts::value<string>()->default_value("~/pathSaver"));
 
     auto optionsParsed = options.parse(argc, argv);
 
@@ -76,6 +75,7 @@ int main(int argc, char* argv[])
     uint16_t androidPort = optionsParsed["port"].as<uint16_t>();
     bool useDrone = !optionsParsed["no_drone"].as<bool>();
     string folderPath = optionsParsed["folder_path"].as<string>();
+    string saverExePath = optionsParsed["saver_exe_path"].as<string>();
 
     auto drone = make_shared<Drone>();
     auto toDroneMessagesHolder = make_shared<ToDroneMessagesHolder>();
@@ -83,6 +83,7 @@ int main(int argc, char* argv[])
     auto androidUdpSocket = make_shared<AndroidUDPSocket>(androidPort);
     auto messageConverter = make_shared<Json_AndroidMessageConverter>();
     auto pathRecorderHandler = make_shared<PathRecorderHandler>(folderPath);
+    auto processExecutor = make_shared<ProcessExecutor>(saverExePath);
 
     if (useDrone)
     {

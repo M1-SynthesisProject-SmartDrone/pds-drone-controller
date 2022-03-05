@@ -13,9 +13,9 @@ AndroidUDPSocket::AndroidUDPSocket(uint16_t listenPort) : UDPSocket()
     }
     catch (std::exception const& exception)
     {
-        LOG_F(ERROR, exception.what());
+        LOG_F(ERROR, "Error while opening socket : %s", exception.what());
         // cannot do anything else, stop all
-        exit(EXIT_FAILURE);
+        throw runtime_error(exception.what());
     }
 }
 

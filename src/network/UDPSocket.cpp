@@ -24,6 +24,7 @@ void UDPSocket::bindPort(uint16_t port)
     address.sin_port = htons(port);
     address.sin_addr.s_addr = htonl(INADDR_ANY);
 
+    LOG_F(INFO, "Try bind on port %d", port);
     // sockaddr struct is a global struct, and sockaddr_in is specialized in IP communications
     if (bind(m_socket, (struct sockaddr *)&address, sizeof(address)) < 0)
     {

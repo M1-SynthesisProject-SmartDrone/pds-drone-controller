@@ -35,6 +35,12 @@ Abstract_AndroidReceivedMessage* Json_AndroidMessageConverter::convertMessageRec
         case MESSAGE_TYPE::TAKE_OFF:
             converted = tryParseTakeOffCommand(content);
             break;
+        case MESSAGE_TYPE::START_COMMAND:
+            converted = tryParseStartCommand(content);
+            break;
+        case MESSAGE_TYPE::ACKNOWLEDGEMENT:
+            converted = tryParseAckCommand(content);
+            break;
         default:
             throw invalid_argument("Message type unknown");
         }
@@ -106,6 +112,10 @@ MESSAGE_TYPE Json_AndroidMessageConverter::findMessageType(Document& doc)
         else if (strcmp(type, "TAKEOFF") == 0)
         {
             return MESSAGE_TYPE::TAKE_OFF;
+        } 
+        else if (strcmp(type, "ACK") == 0)
+        {
+            return MESSAGE_TYPE::ACKNOWLEDGEMENT;
         }
     }
     return MESSAGE_TYPE::UNKNOWN;

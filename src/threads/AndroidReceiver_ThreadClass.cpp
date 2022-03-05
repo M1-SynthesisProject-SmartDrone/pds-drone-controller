@@ -115,6 +115,7 @@ void AndroidReceiver_ThreadClass::handleRecordMessage(Record_MessageReceived* re
     else
     {
         handleEndRecording();
+        string command = "";
     }
 }
 
