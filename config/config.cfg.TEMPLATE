@@ -7,17 +7,19 @@ tmp_folder = "/home/aldric-vs/smart_drone_temp";
 # All executables's paths used by the app
 exe_paths: 
 {
+    check_presence = false;
     path_saver = "/home/aldric-vs/COURS/M1/projet_synthese/repos/pds-path-saver/bin/pathSaver";
 };
 
 drone:
 {
-    test_connection = false;
+    use_drone = false;
     serial_path = "/dev/ttyUSB0";
     baudrate = 57600;
 }
 
 app:
 {
-    port = 6869;
+    send_port = 6869;
+    receive_port = 6869;
 }

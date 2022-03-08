@@ -2,8 +2,13 @@
 
 using namespace std;
 
-AndroidUDPSocket::AndroidUDPSocket(uint16_t listenPort) : UDPSocket() 
+AndroidUDPSocket::AndroidUDPSocket(uint16_t listenPort, uint16_t sendPort) : UDPSocket() 
 {
+    m_sendPort = sendPort;
+    if (m_sendPort == 0)
+    {
+        m_sendPort = listenPort;
+    }
     // By default, the sender is no one (all zeros)
     m_senderAddr = {0};
     try
@@ -49,6 +54,11 @@ void AndroidUDPSocket::sendAsResponse(uint16_t port, const char *msg, int msgLen
     {
         throw system_error(errno, system_category(), "Cannot send message");
     }
+}
+
+uint16_t AndroidUDPSocket::getSendPort()
+{
+    return m_sendPort;
 }
 
 int AndroidUDPSocket::areAddrEquals(struct sockaddr_in x, struct sockaddr_in y)

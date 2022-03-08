@@ -16,7 +16,7 @@ class ProcessExecutor
 private:
     std::filesystem::path m_pathSaverPath;
 public:
-    ProcessExecutor(std::string pathSaverFilename);
+    ProcessExecutor(std::string pathSaverFilename, bool checkFilePresence);
     ~ProcessExecutor();
 
     void launchSavePath(std::string inputFilename);

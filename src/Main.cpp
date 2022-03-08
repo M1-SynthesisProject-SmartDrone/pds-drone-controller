@@ -24,9 +24,7 @@
 #include "android/message/tosend/Answer_MessageToSend.h"
 
 using namespace std;
-// namespace fs = std::filesystem;
 
-const short ANDROID_UDP_PORT = 6969;
 const short DRONE_TIMEOUT_LIMIT = 10000;
 
 void initDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
@@ -80,21 +78,23 @@ int main(int argc, char* argv[])
     const libconfig::Setting& droneSettings = root["drone"];
     int serialBaudrate = droneSettings["baudrate"];
     string serialPath = droneSettings["serial_path"];
-    bool useDrone = droneSettings["test_connection"];
+    bool useDrone = droneSettings["use_drone"];
     
     const libconfig::Setting& appSettings = root["app"];
-    int appPort = appSettings["port"];
+    int appSendPort = appSettings["send_port"];
+    int appReceivePort = appSettings["receive_port"];
 
     const libconfig::Setting& exeSettings = root["exe_paths"];
+    bool checkExesPresence = exeSettings["check_presence"];
     string saverExePath = exeSettings["path_saver"];
 
     auto drone = make_shared<Drone>();
     auto toDroneMessagesHolder = make_shared<ToDroneMessagesHolder>();
     auto toAppMessagesHolder = make_shared<ToAppMessagesHolder>();
-    auto androidUdpSocket = make_shared<AndroidUDPSocket>(appPort);
+    auto androidUdpSocket = make_shared<AndroidUDPSocket>(appReceivePort, appSendPort);
     auto messageConverter = make_shared<Json_AndroidMessageConverter>();
     auto pathRecorderHandler = make_shared<PathRecorderHandler>(tmpFolderPath);
-    auto processExecutor = make_shared<ProcessExecutor>(saverExePath);
+    auto processExecutor = make_shared<ProcessExecutor>(saverExePath, checkExesPresence);
 
     if (useDrone)
     {

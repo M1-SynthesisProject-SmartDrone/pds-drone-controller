@@ -18,6 +18,9 @@
 class AndroidUDPSocket : public UDPSocket
 {
 private:
+    // In certain cases the port where t send can be different from the port where to receive
+    uint16_t m_sendPort;
+
     std::mutex m_lock;
     // Accessed only in a thread-safe way
     sockaddr_in m_senderAddr;
@@ -25,7 +28,10 @@ private:
     int areAddrEquals(struct sockaddr_in x, struct sockaddr_in y);
 
 public:
-    AndroidUDPSocket(uint16_t listenPort);
+    /**
+     * If send port is equals to "0", the value will be set to the listen port
+     */
+    AndroidUDPSocket(uint16_t listenPort, uint16_t sendPort = 0);
     ~AndroidUDPSocket();
 
     int receiveAndSaveSender(char* buffer, int bufferLength, int flags = 0);
@@ -36,6 +42,7 @@ public:
      */
     void sendAsResponse(uint16_t port, const char* msg, int msgLength, int flags = 0);
 
+    uint16_t getSendPort();
 };
 
 #endif // __ANDROIDUDPSOCKET_H__

@@ -85,13 +85,14 @@ void AndroidSender_ThreadClass::sendUpdateMessage()
 {
     auto droneUpdateMessage = fetchDroneData();
     string toSend = m_messageConverter->convertToSendMessage(droneUpdateMessage.get());
-    m_udpSocket->sendAsResponse(m_udpSocket->getPort(), toSend.c_str(), toSend.length());
+    m_udpSocket->sendAsResponse(m_udpSocket->getSendPort(), toSend.c_str(), toSend.length());
 }
 
 void AndroidSender_ThreadClass::sendQueueMessage(unique_ptr<Abstract_AndroidToSendMessage> toSendMessage)
 {
     string toSend = m_messageConverter->convertToSendMessage(toSendMessage.get());
-    m_udpSocket->sendAsResponse(m_udpSocket->getPort(), toSend.c_str(), toSend.length());
+    cout << m_udpSocket->getSendPort() << endl;
+    m_udpSocket->sendAsResponse(m_udpSocket->getSendPort(), toSend.c_str(), toSend.length());
 }
 
 unique_ptr<DroneData_MessageToSend> AndroidSender_ThreadClass::fetchDroneData()
