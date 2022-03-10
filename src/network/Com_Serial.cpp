@@ -19,7 +19,7 @@ using namespace std;
 // extern ofstream MyFilew;
 double t_oldw = -1.;
 
-#include "../../include/network/Com_Serial.h"
+#include "network/Com_Serial.h"
 
 Serial_Port::Serial_Port(std::string uart_name, int baudrate)
 {

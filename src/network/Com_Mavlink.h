@@ -25,8 +25,8 @@
 
 #include <mavlink/common/mavlink.h>
 
-#include "../Constants.h"
-#include "Com_Serial.h"
+#include "Constants.h"
+#include "network/Com_Serial.h"
 
 
 /*

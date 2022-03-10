@@ -11,7 +11,7 @@
 using namespace std;
 
 #include <sys/time.h>
-#include "../../include/threads/Abstract_ThreadClass.h"
+#include "threads/Abstract_ThreadClass.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%% begin/end phase function %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

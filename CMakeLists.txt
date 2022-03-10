@@ -60,11 +60,11 @@ find_library(libconfig++ libconfig++)
 # include(FindPkgConfig)
 # pkg_check_modules(libconfig++-dev REQUIRED libconf)
 
-message("- Checking : Blc channels")
-find_package(blc_channel REQUIRED)
-find_package(blc_program REQUIRED)
-include_directories( ${BL_INCLUDE_DIRS} )
-add_definitions( ${BL_DEFINITIONS} )
+# message("- Checking : Blc channels")
+# find_package(blc_channel REQUIRED)
+# find_package(blc_program REQUIRED)
+# include_directories( ${BL_INCLUDE_DIRS} )
+# add_definitions( ${BL_DEFINITIONS} )
 
 
 message("- Checking : Thread")
@@ -82,7 +82,7 @@ include_directories(${CURSES_INCLUDE_DIR})
 link_libraries(
     # ${CXXOPTS_LIB}
    #  ${RAPIDJSON_LIB}
-    ${BL_LIBRARIES} 
+    # ${BL_LIBRARIES} 
     # ${MAVLINK_LIB}
    #  ${LOGURU_LIB}
     ${CURSES_LIBRARIES}
@@ -96,8 +96,7 @@ link_libraries(
 
 add_subdirectory(lib)
 include_directories(lib)
-include_directories(include)
-
+include_directories(src)
 
 ######################################################################################################
 ###                                         APPLICATION                                             ##
@@ -109,8 +108,8 @@ message("\n%% APPLICATION GENERATION")
 
 file(GLOB_RECURSE drone_SRC 
     "lib/*.h"
-    "include/*.h"
-     "src/*.cpp"
+    "src/*.h"
+    "src/*.cpp"
 )
 
 # Copy the config file to the bin folder to make it run

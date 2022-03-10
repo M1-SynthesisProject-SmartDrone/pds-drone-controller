@@ -1,4 +1,4 @@
-#include "android/converter/Json_AndroidMessageConverter.h"
+#include "Json_AndroidMessageConverter.h"
 
 using namespace std;
 using namespace rapidjson;

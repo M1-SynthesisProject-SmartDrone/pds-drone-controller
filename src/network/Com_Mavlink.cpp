@@ -7,7 +7,7 @@
  * @version 1.1 
  */
 
-#include "../../include/network/Com_Mavlink.h"
+#include "network/Com_Mavlink.h"
 
 MavlinkTools::MavlinkTools()
 {
