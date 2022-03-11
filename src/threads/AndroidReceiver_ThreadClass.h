@@ -14,7 +14,7 @@
 #include "threads/bridges/ToAppMessagesHolder.h"
 #include "threads/bridges/PathRecorderHandler.h"
 #include "drone/Data_Drone.h"
-#include "android/AndroidUDPSocket.h"
+#include "android/network/AndroidMediator.h"
 #include "android/message/received/Abstract_AndroidReceivedMessage.h"
 #include "android/message/received/Record_MessageReceived.h"
 #include "android/message/received/Ack_MessageReceived.h"
@@ -25,26 +25,22 @@ class AndroidReceiver_ThreadClass : public Abstract_ThreadClass
 private:
     std::shared_ptr<ToDroneMessagesHolder> m_droneMessageHolder;
     std::shared_ptr<ToAppMessagesHolder> m_appMessagesHolder;
-    std::shared_ptr<AndroidUDPSocket> m_UDPSocket;
-    std::shared_ptr<Abstract_AndroidMessageConverter> m_messageConverter;
+    std::shared_ptr<AndroidMediator> m_mediator;
     std::shared_ptr<PathRecorderHandler> m_pathRecorder;
 
     // Methods
-    std::unique_ptr<Abstract_AndroidReceivedMessage> receiveMessage();
     void handleRecordMessage(Record_MessageReceived* recordMessage);
     void handleStartRecording();
     void handleEndRecording();
     void handleAckMessage(Ack_MessageReceived* ackMessage);
 
-    const int BUFFER_SIZE = 1024;
-
 public:
     AndroidReceiver_ThreadClass(
-        std::shared_ptr<AndroidUDPSocket> androidUDPSocket,
+        std::shared_ptr<AndroidMediator> androidMediator,
         std::shared_ptr<PathRecorderHandler> pathRecorderHandler,
         std::shared_ptr<ToAppMessagesHolder> appMessagesHolder,
-        std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder,
-        std::shared_ptr<Abstract_AndroidMessageConverter> messageConverter);
+        std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder
+    );
     ~AndroidReceiver_ThreadClass();
 
     void run();

@@ -5,18 +5,16 @@
 using namespace std;
 
 AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(
-    std::shared_ptr<AndroidUDPSocket> androidUDPSocket,
+    std::shared_ptr<AndroidMediator> androidMediator,
     std::shared_ptr<PathRecorderHandler> pathRecorderHandler,
     std::shared_ptr<ToAppMessagesHolder> appMessagesHolder,
-    std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder,
-    std::shared_ptr<Abstract_AndroidMessageConverter> messageConverter)
-    : Abstract_ThreadClass(1000, 200)
+    std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder
+): Abstract_ThreadClass(1000, 200)
 {
-    m_UDPSocket = androidUDPSocket;
+    m_mediator = androidMediator;
     m_droneMessageHolder = droneMessageHolder;
     m_appMessagesHolder = appMessagesHolder;
     m_pathRecorder = pathRecorderHandler;
-    m_messageConverter = messageConverter;
 }
 
 AndroidReceiver_ThreadClass::~AndroidReceiver_ThreadClass()
@@ -32,7 +30,7 @@ void AndroidReceiver_ThreadClass::run()
         usleep(task_period);
         try
         {
-            unique_ptr<Abstract_AndroidReceivedMessage> messageReceived = this->receiveMessage();
+            auto messageReceived = m_mediator->receiveMessage();
             // Special case, we want to handle record
             switch (messageReceived->messageType)
             {
@@ -59,20 +57,6 @@ void AndroidReceiver_ThreadClass::run()
             LOG_F(ERROR, e.what());
         }
     }
-}
-
-std::unique_ptr<Abstract_AndroidReceivedMessage> AndroidReceiver_ThreadClass::receiveMessage()
-{
-    // Must be a too big buffer to work with
-    char buffer[BUFFER_SIZE];
-    int bytesRead = m_UDPSocket->receiveAndSaveSender(buffer, BUFFER_SIZE);
-    if (bytesRead >= BUFFER_SIZE)
-    {
-        LOG_F(ERROR, "Received bigger message than buffer could handle, message truncated");
-    }
-
-    auto convertedMessage = m_messageConverter->convertMessageReceived(string(buffer));
-    return unique_ptr<Abstract_AndroidReceivedMessage>(convertedMessage);
 }
 
 void AndroidReceiver_ThreadClass::handleStartRecording()

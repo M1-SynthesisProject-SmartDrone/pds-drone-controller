@@ -15,8 +15,8 @@ struct ConfigDrone
 
 struct ConfigApp
 {
-    int appSendPort;
-    int appReceivePort;
+    int sendPort;
+    int receivePort;
 };
 
 struct ConfigExes
