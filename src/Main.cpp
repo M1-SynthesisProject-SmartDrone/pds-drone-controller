@@ -23,8 +23,6 @@
 #include "drone/Data_Drone.h"
 #include "process/ProcessExecutor.h"
 
-#include "android/message/tosend/Answer_MessageToSend.h"
-
 using namespace std;
 
 const short DRONE_TIMEOUT_LIMIT = 10000;

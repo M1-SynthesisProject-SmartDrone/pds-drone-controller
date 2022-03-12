@@ -15,7 +15,7 @@ struct Record_MessageReceived : Abstract_AndroidReceivedMessage
 
     Record_MessageReceived(bool record)
     {
-        this->messageType = MESSAGE_TYPE::RECORD;
+        this->messageType = MESSAGE_TYPE::REQ_RECORD;
         this->record = record;
     }
 

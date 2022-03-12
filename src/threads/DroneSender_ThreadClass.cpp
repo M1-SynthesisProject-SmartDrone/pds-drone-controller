@@ -60,7 +60,7 @@ void DroneSender_ThreadClass::handleStartMessage(Start_MessageReceived* startMes
         {
             LOG_F(INFO, "Start : Drone motors already in wanted state");
             // Technically this is already done, so the operation is a success
-            auto toSend = make_unique<Answer_MessageToSend>("START_DRONE", true, "Drone already armed");
+            auto toSend = make_unique<StartDrone_MessageToSend>(true, "Drone already armed");
             m_appMessagesHolder->add(move(toSend));
         }
         else
@@ -71,49 +71,8 @@ void DroneSender_ThreadClass::handleStartMessage(Start_MessageReceived* startMes
     }
     else
     {
-        auto toSend = make_unique<Answer_MessageToSend>("START_DRONE", false, "Start drone does not accept false value (useless)");
+        auto toSend = make_unique<StartDrone_MessageToSend>(false, "Start drone does not accept false value (useless)");
         m_appMessagesHolder->add(move(toSend));
-    }
-}
-
-void DroneSender_ThreadClass::handleArmMessage(Arm_MessageReceived* armMessage)
-{
-    // we probably want to make some verfications here
-    LOG_F(INFO, "Send arming command");
-    bool arm = armMessage->armDrone;
-    if ((arm && m_drone->motors == Drone_Motors::ARM) || (!arm && m_drone->motors == Drone_Motors::UNARM))
-    {
-        LOG_F(INFO, "Arm : Drone motors already in wanted state");
-        // Technically this is already done, so the operation is a success
-        auto toSend = make_unique<Answer_MessageToSend>("ARM", true, "Drone already in wanted state");
-        m_appMessagesHolder->add(move(toSend));
-    }
-    else
-    {
-        int command = arm ? 1 : 0;
-        m_drone->command_arm(command);
-    }
-}
-
-void DroneSender_ThreadClass::handleTakeOffMessage(TakeOff_MessageReceived* takeOffMessage)
-{
-    bool takeOff = takeOffMessage->takeOff;
-    if (takeOff == m_drone->tookOff)
-    {
-        LOG_F(INFO, "Take off : Drone is already at wanted state");
-        auto toSend = make_unique<Answer_MessageToSend>("TAKE_OFF", true, "Drone already in wanted state");
-        m_appMessagesHolder->add(move(toSend));
-    }
-    // ! We probably want to check some conditions here (grounded, etc.)
-    else if (takeOff)
-    {
-        LOG_F(INFO, "Send Take off command");
-        m_drone.get()->take_off();
-    }
-    else
-    {
-        LOG_F(INFO, "Send landing command");
-        m_drone.get()->landing();
     }
 }
 
@@ -132,53 +91,20 @@ void DroneSender_ThreadClass::handleManualControlMessage(Manual_MessageReceived*
     );
 }
 
-void DroneSender_ThreadClass::handleRecordMessage(Record_MessageReceived* recordMessage)
-{
-    bool record = recordMessage->record;
-    if (record)
-    {
-        // if (m_drone->motors == Drone_Motors::ARM)
-    }
-    else
-    {
-
-    }
-}
-
 void DroneSender_ThreadClass::onMessageReceived(Abstract_AndroidReceivedMessage* androidMessage)
 {
     switch (androidMessage->messageType)
     {
-    case MESSAGE_TYPE::START_COMMAND:
+    case MESSAGE_TYPE::REQ_START_DRONE:
     {
         auto startMessageReceived = static_cast<Start_MessageReceived*>(androidMessage);
         handleStartMessage(startMessageReceived);
     }
     break;
-    case MESSAGE_TYPE::ARM_COMMAND:
-        // * Brackets are made to avoid cross initialization error (var defined in all scopes)
-        // see : https://stackoverflow.com/questions/11578936/getting-a-bunch-of-crosses-initialization-error#answer-11578973
-    {
-        auto armMessage = static_cast<Arm_MessageReceived*>(androidMessage);
-        handleArmMessage(armMessage);
-    }
-    break;
-    case MESSAGE_TYPE::MANUAL_CONTROL:
+    case MESSAGE_TYPE::REQ_MANUAL_CONTROL:
     {
         auto manualMessage = static_cast<Manual_MessageReceived*>(androidMessage);
         handleManualControlMessage(manualMessage);
-    }
-    break;
-    case MESSAGE_TYPE::RECORD:
-    {
-        auto recordMessage = static_cast<Record_MessageReceived*>(androidMessage);
-
-    }
-    break;
-    case MESSAGE_TYPE::TAKE_OFF:
-    {
-        TakeOff_MessageReceived* takeOffMessage = static_cast<TakeOff_MessageReceived*>(androidMessage);
-        handleTakeOffMessage(takeOffMessage);
     }
     break;
     case MESSAGE_TYPE::UNKNOWN:

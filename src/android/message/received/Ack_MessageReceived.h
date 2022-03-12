@@ -12,7 +12,7 @@ struct Ack_MessageReceived : Abstract_AndroidReceivedMessage
 {
     Ack_MessageReceived()
     {
-        this->messageType = MESSAGE_TYPE::ACKNOWLEDGEMENT;
+        this->messageType = MESSAGE_TYPE::REQ_ACK;
     }
 
     std::string toString()

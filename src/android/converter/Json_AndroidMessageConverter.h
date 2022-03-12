@@ -8,32 +8,19 @@
  * @author Aldric Vitali Silvestre
  */
  // Library used : https://rapidjson.org/
- 
+
+#include <memory>
 #include <stdexcept>
 #include <algorithm>
 #include <string>
 
-#include <rapidjson/rapidjson.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/document.h>
-#include <loguru/loguru.hpp>
-
 #include "Abstract_AndroidMessageConverter.h"
-#include "android/message/MessageType.h"
-#include "android/message/received/Manual_MessageReceived.h"
-#include "android/message/received/Arm_MessageReceived.h"
-#include "android/message/received/Ack_MessageReceived.h"
-#include "android/message/received/TakeOff_MessageReceived.h"
-#include "android/message/received/Manual_MessageReceived.h"
-#include "android/message/received/Start_MessageReceived.h"
-#include "android/message/received/Record_MessageReceived.h"
 
 #include "android/message/tosend/Abstract_AndroidToSendMessage.h"
-#include "android/message/tosend/DroneData_MessageToSend.h"
-#include "android/message/tosend/DroneStatus_MessageToSend.h"
-#include "android/message/tosend/Answer_MessageToSend.h"
+#include "android/message/received/Abstract_AndroidReceivedMessage.h"
 
+#include "android/converter/Json_ReceivedMessagesConverter.h"
+#include "android/converter/Json_ToSendMessagesConverter.h"
 
 class Json_AndroidMessageConverter : public Abstract_AndroidMessageConverter
 {
@@ -44,21 +31,8 @@ public:
     Abstract_AndroidReceivedMessage* convertMessageReceived(std::string message);
     std::string convertToSendMessage(Abstract_AndroidToSendMessage* message);
 private:
-    /* data */
-    MESSAGE_TYPE findMessageType(rapidjson::Document& doc);
-
-    // Convert recevied message
-    Ack_MessageReceived* tryParseAckCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-    Start_MessageReceived* tryParseStartCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-    Record_MessageReceived* tryParseRecordCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-    Manual_MessageReceived* tryParseManualCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-    Arm_MessageReceived* tryParseArmCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-    TakeOff_MessageReceived* tryParseTakeOffCommand(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-
-    // Convert to send message
-    rapidjson::Document convertDroneUpdateMessage(DroneData_MessageToSend* droneData);
-    rapidjson::Document convertDroneStatusMessage(DroneStatus_MessageToSend* droneStatus);
-    rapidjson::Document convertAnswerMessage(Answer_MessageToSend* answer);
+    std::unique_ptr<Json_ReceivedMessagesConverter> m_receivedMessagesConverter;
+    std::unique_ptr<Json_ToSendMessagesConverter> m_toSendMessagesConverter;
 };
 
 

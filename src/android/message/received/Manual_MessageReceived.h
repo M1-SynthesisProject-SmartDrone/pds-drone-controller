@@ -19,7 +19,7 @@ struct Manual_MessageReceived : Abstract_AndroidReceivedMessage
 
     Manual_MessageReceived(double leftMove, double leftRotation, double forwardMove, double motorPower)
     {
-        this->messageType = MESSAGE_TYPE::MANUAL_CONTROL;
+        this->messageType = MESSAGE_TYPE::REQ_MANUAL_CONTROL;
         this->leftMove = leftMove;
         this->leftRotation = leftRotation;
         this->forwardMove = forwardMove;

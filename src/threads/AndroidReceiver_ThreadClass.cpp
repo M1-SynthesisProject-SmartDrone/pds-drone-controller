@@ -34,13 +34,13 @@ void AndroidReceiver_ThreadClass::run()
             // Special case, we want to handle record
             switch (messageReceived->messageType)
             {
-            case MESSAGE_TYPE::RECORD:
+            case MESSAGE_TYPE::REQ_RECORD:
             {
                 auto recordMessage = static_cast<Record_MessageReceived*>(messageReceived.get());
                 handleRecordMessage(recordMessage);
             }
             break;
-            case MESSAGE_TYPE::ACKNOWLEDGEMENT:
+            case MESSAGE_TYPE::REQ_ACK:
             {
                 auto ackMessage = static_cast<Ack_MessageReceived*>(messageReceived.get());
                 handleAckMessage(ackMessage);
@@ -61,31 +61,31 @@ void AndroidReceiver_ThreadClass::run()
 
 void AndroidReceiver_ThreadClass::handleStartRecording()
 {
-    unique_ptr<Answer_MessageToSend> answer;
+    unique_ptr<Record_MessageToSend> answer;
     try
     {
         m_pathRecorder->startRecording();
-        answer = make_unique<Answer_MessageToSend>("RECORD", true, "Record started");
+        answer = make_unique<Record_MessageToSend>(true, "Record started");
     }
     catch(const std::exception& e)
     {
-        answer = make_unique<Answer_MessageToSend>("RECORD", false, "Cannot start record : " + string(e.what()));
+        answer = make_unique<Record_MessageToSend>(false, "Cannot start record : " + string(e.what()));
     }
     m_appMessagesHolder->add(move(answer));
 }
 
 void AndroidReceiver_ThreadClass::handleEndRecording()
 {
-    unique_ptr<Answer_MessageToSend> answer;
+    unique_ptr<Record_MessageToSend> answer;
     try
     {
         string filename = m_pathRecorder->stopRecording();
         // TODO : launch an app to store to DB
-        answer = make_unique<Answer_MessageToSend>("RECORD", true, "Record ended");
+        answer = make_unique<Record_MessageToSend>(true, "Record ended");
     }
     catch(const std::exception& e)
     {
-        answer = make_unique<Answer_MessageToSend>("RECORD", false, "Cannot end record");
+        answer = make_unique<Record_MessageToSend>(false, "Cannot end record");
     }
     m_appMessagesHolder->add(move(answer));
 }
@@ -106,6 +106,6 @@ void AndroidReceiver_ThreadClass::handleRecordMessage(Record_MessageReceived* re
 void AndroidReceiver_ThreadClass::handleAckMessage(Ack_MessageReceived* ackMessage)
 {
     // Only thing to do is to respond here
-    auto answer = make_unique<Answer_MessageToSend>("ACK", true);
+    auto answer = make_unique<Ack_MessageToSend>(true);
     m_appMessagesHolder->add(move(answer));
 }

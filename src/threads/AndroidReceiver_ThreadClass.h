@@ -15,9 +15,6 @@
 #include "threads/bridges/PathRecorderHandler.h"
 #include "drone/Data_Drone.h"
 #include "android/network/AndroidMediator.h"
-#include "android/message/received/Abstract_AndroidReceivedMessage.h"
-#include "android/message/received/Record_MessageReceived.h"
-#include "android/message/received/Ack_MessageReceived.h"
 #include "android/converter/Json_AndroidMessageConverter.h"
 
 class AndroidReceiver_ThreadClass : public Abstract_ThreadClass
