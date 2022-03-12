@@ -64,6 +64,12 @@ Record_MessageReceived* Json_ReceivedMessagesConverter::parseRecordRequest(rapid
     };
 }
 
+
+DroneInfos_MessageReceived* Json_ReceivedMessagesConverter::parseDroneInfosRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj)
+{
+    return new DroneInfos_MessageReceived();
+}
+
 Manual_MessageReceived* Json_ReceivedMessagesConverter::parseManualRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj)
 {
     double leftMove = obj["y"].GetDouble();

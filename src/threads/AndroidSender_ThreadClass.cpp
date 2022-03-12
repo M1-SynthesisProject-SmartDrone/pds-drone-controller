@@ -21,7 +21,6 @@ void AndroidSender_ThreadClass::run()
 
     while (isRunFlag())
     {
-        m_timeRemainingMs -= task_period;
         try
         {
             auto message = m_appMsgHolder->pop();

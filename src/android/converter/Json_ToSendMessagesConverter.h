@@ -2,6 +2,8 @@
 #define __JSON_TOSENDMESSAGESCONVERTER_H__
 
 #include <string>
+#include <functional>
+#include <unordered_map>
 
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/stringbuffer.h>
