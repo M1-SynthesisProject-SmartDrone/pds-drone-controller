@@ -14,11 +14,9 @@
 #include "android/message/received/Abstract_AndroidReceivedMessage.h"
 #include "android/message/received/Start_MessageReceived.h"
 #include "android/message/received/Record_MessageReceived.h"
-#include "android/message/received/Arm_MessageReceived.h"
 #include "android/message/received/Manual_MessageReceived.h"
-#include "android/message/received/TakeOff_MessageReceived.h"
 
-#include "android/message/tosend/Answer_MessageToSend.h"
+#include "android/message/tosend/StartDrone_MessageToSend.h"
 
 #include "network/Com_Serial.h"
 #include "network/Com_Mavlink.h"
@@ -49,9 +47,7 @@ private:
     void onMessageReceived(Abstract_AndroidReceivedMessage* androidMessage);
     void handleStartMessage(Start_MessageReceived* startMessage);
     void handleRecordMessage(Record_MessageReceived* recordMessage);
-    void handleArmMessage(Arm_MessageReceived* armMessage);
     void handleManualControlMessage(Manual_MessageReceived* manualControlMessage);
-    void handleTakeOffMessage(TakeOff_MessageReceived* takeOffMessage);
 
 public:
     /**

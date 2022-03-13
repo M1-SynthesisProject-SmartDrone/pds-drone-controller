@@ -8,8 +8,12 @@
  * A message sent periodically to the app in order to update drone infos on the UI.
  * @author Aldric Vitali Silvestre
  */
-struct DroneData_MessageToSend : Abstract_AndroidToSendMessage
+struct DroneInfos_MessageToSend : Abstract_AndroidToSendMessage
 {
+    bool isArmed;
+
+    bool isRecording;
+
     /**
      * From 0% to 100%
      */
@@ -44,9 +48,9 @@ struct DroneData_MessageToSend : Abstract_AndroidToSendMessage
      */ 
     uint16_t yawRotation;
 
-    DroneData_MessageToSend()
+    DroneInfos_MessageToSend()
     {
-        this->messageType = MESSAGE_TYPE::DRONE_DATA;
+        this->messageType = MESSAGE_TYPE::RESP_DRONE_INFOS;
     }
 };
 

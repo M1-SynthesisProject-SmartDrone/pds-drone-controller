@@ -5,18 +5,18 @@
 using namespace std;
 
 AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(
-    std::shared_ptr<AndroidUDPSocket> androidUDPSocket,
+    std::shared_ptr<Drone> drone,
+    std::shared_ptr<AndroidMediator> androidMediator,
     std::shared_ptr<PathRecorderHandler> pathRecorderHandler,
     std::shared_ptr<ToAppMessagesHolder> appMessagesHolder,
-    std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder,
-    std::shared_ptr<Abstract_AndroidMessageConverter> messageConverter)
-    : Abstract_ThreadClass(1000, 200)
+    std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder
+) : Abstract_ThreadClass(1000, 200)
 {
-    m_UDPSocket = androidUDPSocket;
+    m_drone = drone;
+    m_mediator = androidMediator;
     m_droneMessageHolder = droneMessageHolder;
     m_appMessagesHolder = appMessagesHolder;
     m_pathRecorder = pathRecorderHandler;
-    m_messageConverter = messageConverter;
 }
 
 AndroidReceiver_ThreadClass::~AndroidReceiver_ThreadClass()
@@ -32,22 +32,26 @@ void AndroidReceiver_ThreadClass::run()
         usleep(task_period);
         try
         {
-            unique_ptr<Abstract_AndroidReceivedMessage> messageReceived = this->receiveMessage();
+            auto messageReceived = m_mediator->receiveMessage();
             // Special case, we want to handle record
             switch (messageReceived->messageType)
             {
-            case MESSAGE_TYPE::RECORD:
+            case MESSAGE_TYPE::REQ_RECORD:
             {
                 auto recordMessage = static_cast<Record_MessageReceived*>(messageReceived.get());
                 handleRecordMessage(recordMessage);
             }
             break;
-            case MESSAGE_TYPE::ACKNOWLEDGEMENT:
+            case MESSAGE_TYPE::REQ_ACK:
             {
                 auto ackMessage = static_cast<Ack_MessageReceived*>(messageReceived.get());
                 handleAckMessage(ackMessage);
             }
             break;
+            case MESSAGE_TYPE::REQ_DRONE_INFOS:
+            {
+                sendDroneInfos();
+            }
             default:
                 // No special case, send it to drone sender
                 m_droneMessageHolder->add(move(messageReceived));
@@ -61,47 +65,33 @@ void AndroidReceiver_ThreadClass::run()
     }
 }
 
-std::unique_ptr<Abstract_AndroidReceivedMessage> AndroidReceiver_ThreadClass::receiveMessage()
-{
-    // Must be a too big buffer to work with
-    char buffer[BUFFER_SIZE];
-    int bytesRead = m_UDPSocket->receiveAndSaveSender(buffer, BUFFER_SIZE);
-    if (bytesRead >= BUFFER_SIZE)
-    {
-        LOG_F(ERROR, "Received bigger message than buffer could handle, message truncated");
-    }
-
-    auto convertedMessage = m_messageConverter->convertMessageReceived(string(buffer));
-    return unique_ptr<Abstract_AndroidReceivedMessage>(convertedMessage);
-}
-
 void AndroidReceiver_ThreadClass::handleStartRecording()
 {
-    unique_ptr<Answer_MessageToSend> answer;
+    unique_ptr<Record_MessageToSend> answer;
     try
     {
         m_pathRecorder->startRecording();
-        answer = make_unique<Answer_MessageToSend>("RECORD", true, "Record started");
+        answer = make_unique<Record_MessageToSend>(true, "Record started");
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
-        answer = make_unique<Answer_MessageToSend>("RECORD", false, "Cannot start record : " + string(e.what()));
+        answer = make_unique<Record_MessageToSend>(false, "Cannot start record : " + string(e.what()));
     }
     m_appMessagesHolder->add(move(answer));
 }
 
 void AndroidReceiver_ThreadClass::handleEndRecording()
 {
-    unique_ptr<Answer_MessageToSend> answer;
+    unique_ptr<Record_MessageToSend> answer;
     try
     {
         string filename = m_pathRecorder->stopRecording();
         // TODO : launch an app to store to DB
-        answer = make_unique<Answer_MessageToSend>("RECORD", true, "Record ended");
+        answer = make_unique<Record_MessageToSend>(true, "Record ended");
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
-        answer = make_unique<Answer_MessageToSend>("RECORD", false, "Cannot end record");
+        answer = make_unique<Record_MessageToSend>(false, "Cannot end record");
     }
     m_appMessagesHolder->add(move(answer));
 }
@@ -122,6 +112,32 @@ void AndroidReceiver_ThreadClass::handleRecordMessage(Record_MessageReceived* re
 void AndroidReceiver_ThreadClass::handleAckMessage(Ack_MessageReceived* ackMessage)
 {
     // Only thing to do is to respond here
-    auto answer = make_unique<Answer_MessageToSend>("ACK", true);
+    auto answer = make_unique<Ack_MessageToSend>(true);
     m_appMessagesHolder->add(move(answer));
+}
+
+void AndroidReceiver_ThreadClass::sendDroneInfos()
+{
+    auto droneInfos = createDroneInfos();
+    m_appMessagesHolder->add(move(droneInfos));
+}
+
+unique_ptr<DroneInfos_MessageToSend> AndroidReceiver_ThreadClass::createDroneInfos()
+{
+    auto droneInfos = make_unique<DroneInfos_MessageToSend>();
+    auto globalPos = m_drone->global_position_int;
+
+    droneInfos->isArmed = m_drone->motors == Drone_Motors::ARM;
+    droneInfos->isRecording = m_pathRecorder->isRecording();
+    droneInfos->batteryRemaining = m_drone->battery_status.battery_remaining;
+    droneInfos->lat = globalPos.lat;
+    droneInfos->lon = globalPos.lon;
+    droneInfos->alt = globalPos.alt;
+    droneInfos->relativeAlt = globalPos.relative_alt;
+    droneInfos->vx = globalPos.vx;
+    droneInfos->vy = globalPos.vy;
+    droneInfos->vz = globalPos.vz;
+    droneInfos->yawRotation = globalPos.hdg;
+
+    return droneInfos;
 }

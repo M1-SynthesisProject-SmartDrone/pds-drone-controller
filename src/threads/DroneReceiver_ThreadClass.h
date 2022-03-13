@@ -18,8 +18,6 @@
 #include "drone/Data_Drone.h"
 #include "threads/bridges/ToAppMessagesHolder.h"
 #include "threads/bridges/PathRecorderHandler.h"
-#include "android/message/tosend/Answer_MessageToSend.h"
-#include "android/message/tosend/DroneStatus_MessageToSend.h"
 
 class DroneReceiver_ThreadClass : public Abstract_ThreadClass
 {

@@ -23,8 +23,6 @@
 #include "drone/Data_Drone.h"
 #include "process/ProcessExecutor.h"
 
-#include "android/message/tosend/Answer_MessageToSend.h"
-
 using namespace std;
 
 const short DRONE_TIMEOUT_LIMIT = 10000;
@@ -43,7 +41,7 @@ int main(int argc, char* argv[])
     auto drone = make_shared<Drone>();
     auto toDroneMessagesHolder = make_shared<ToDroneMessagesHolder>();
     auto toAppMessagesHolder = make_shared<ToAppMessagesHolder>();
-    auto androidUdpSocket = make_shared<AndroidUDPSocket>(params.appParams.appReceivePort, params.appParams.appSendPort);
+    auto androidMediator = make_shared<AndroidMediator>(params.appParams.receivePort, params.appParams.sendPort);
     auto messageConverter = make_shared<Json_AndroidMessageConverter>();
     auto pathRecorderHandler = make_shared<PathRecorderHandler>(params.globalParams.tmpFolderPath);
     auto processExecutor = make_shared<ProcessExecutor>(params.exesParams.saverExePath, params.exesParams.checkExesPresence);
@@ -55,17 +53,17 @@ int main(int argc, char* argv[])
     vector<unique_ptr<Abstract_ThreadClass>> threads;
     threads.push_back(
         make_unique<AndroidReceiver_ThreadClass>(
-            androidUdpSocket,
+            drone,
+            androidMediator,
             pathRecorderHandler,
             toAppMessagesHolder,
-            toDroneMessagesHolder, 
-            messageConverter));
+            toDroneMessagesHolder
+        ));
     threads.push_back(
         make_unique<AndroidSender_ThreadClass>(
-            drone, 
-            androidUdpSocket, 
-            toAppMessagesHolder, 
-            messageConverter));
+            androidMediator, 
+            toAppMessagesHolder
+        ));
     if (useDrone)
     {
         threads.push_back(

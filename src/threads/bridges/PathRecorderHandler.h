@@ -52,6 +52,8 @@ public:
      */
     std::string stopRecording();
 
+    bool isRecording();
+
     /**
      * Convert the data and insert it in the file's record session.
      * This will do nothing if no record is currently running.

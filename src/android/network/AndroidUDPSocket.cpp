@@ -1,4 +1,4 @@
-#include "android/AndroidUDPSocket.h"
+#include "AndroidUDPSocket.h"
 
 using namespace std;
 

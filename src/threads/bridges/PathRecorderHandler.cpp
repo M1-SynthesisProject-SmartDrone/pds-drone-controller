@@ -69,6 +69,11 @@ void PathRecorderHandler::insertData(int32_t latitude, int32_t longitude, int32_
     }
 }
 
+bool PathRecorderHandler::isRecording()
+{
+    return m_isRecording;
+}
+
 string PathRecorderHandler::createRandomString()
 {
     string str(NAME_LENGTH, 0);
@@ -78,9 +83,9 @@ string PathRecorderHandler::createRandomString()
 
 string PathRecorderHandler::intToCoordinate(int32_t n)
 {
-    // max length of coordinate is 7 digits (+ count the '\0' character)
-    char buffer[8];
-    snprintf(buffer, 8, "%07d", n);
+    // max length of coordinate is 9 digits (+ count the '\0' character)
+    char buffer[10];
+    snprintf(buffer, 9, "%08d", n);
     string numStr(buffer);
 
     // From char 0, take 2 chars
