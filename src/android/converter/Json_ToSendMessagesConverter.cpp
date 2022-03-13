@@ -29,9 +29,10 @@ std::string Json_ToSendMessagesConverter::convertToSendMessage(Abstract_AndroidT
         Document document = messageConverterFunc(message);
         StringBuffer buffer;
         buffer.Clear();
-        Writer<StringBuffer> writer(buffer);
+        Writer<StringBuffer, Document::EncodingType, UTF8<>> writer(buffer);
         document.Accept(writer);
-        return string(buffer.GetString());
+        string convertedStr(buffer.GetString());
+        return convertedStr;
     }
     catch (const std::exception& e)
     {
@@ -56,19 +57,18 @@ std::function<rapidjson::Document(Abstract_AndroidToSendMessage*)>
 }
 
 // ==== CONVERTERS ====
-Document createBaseDocument(string messageType)
+Document createBaseDocument(char* messageType)
 {
     Document document;
     document.SetObject();
-    rapidjson::GenericStringRef<char> value(messageType.c_str());
 
     Document::AllocatorType& allocator = document.GetAllocator();
-    document.AddMember("type", value, allocator);
+    document.AddMember("type", StringRef(messageType), allocator);
     return document;
 }
 
 // This is a shortcut for answer messages types, that have nearly the same shape
-Document convertAnswerMessage(string messageType, Abstract_Answer_MessageToSend* answer)
+Document convertAnswerMessage(char*  messageType, Abstract_Answer_MessageToSend* answer)
 {
     Document document = createBaseDocument(messageType);
     Document::AllocatorType& allocator = document.GetAllocator();
