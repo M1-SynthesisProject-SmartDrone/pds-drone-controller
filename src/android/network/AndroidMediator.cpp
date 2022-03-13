@@ -4,9 +4,9 @@
 
 using namespace std;
 
-AndroidMediator::AndroidMediator(uint16_t senderPort, uint16_t receiverPort)
+AndroidMediator::AndroidMediator(uint16_t receivePort, uint16_t sendPort)
 {
-    m_socket = make_unique<AndroidUDPSocket>(receiverPort, senderPort);
+    m_socket = make_unique<AndroidUDPSocket>(receivePort, sendPort);
     m_converter = make_unique<Json_AndroidMessageConverter>();
 }
 

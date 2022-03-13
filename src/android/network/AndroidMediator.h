@@ -20,7 +20,7 @@ private:
 
     const int BUFFER_SIZE = 4096;
 public:
-    AndroidMediator(uint16_t senderPort, uint16_t receiverPort);
+    AndroidMediator(uint16_t receivePort, uint16_t sendPort);
     ~AndroidMediator();
 
     void sendMessage(std::unique_ptr<Abstract_AndroidToSendMessage> messageToSend);
