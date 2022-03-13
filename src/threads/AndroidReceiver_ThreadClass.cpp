@@ -5,12 +5,14 @@
 using namespace std;
 
 AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(
+    std::shared_ptr<Drone> drone,
     std::shared_ptr<AndroidMediator> androidMediator,
     std::shared_ptr<PathRecorderHandler> pathRecorderHandler,
     std::shared_ptr<ToAppMessagesHolder> appMessagesHolder,
     std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder
-): Abstract_ThreadClass(1000, 200)
+) : Abstract_ThreadClass(1000, 200)
 {
+    m_drone = drone;
     m_mediator = androidMediator;
     m_droneMessageHolder = droneMessageHolder;
     m_appMessagesHolder = appMessagesHolder;
@@ -46,6 +48,10 @@ void AndroidReceiver_ThreadClass::run()
                 handleAckMessage(ackMessage);
             }
             break;
+            case MESSAGE_TYPE::REQ_DRONE_INFOS:
+            {
+                sendDroneInfos();
+            }
             default:
                 // No special case, send it to drone sender
                 m_droneMessageHolder->add(move(messageReceived));
@@ -67,7 +73,7 @@ void AndroidReceiver_ThreadClass::handleStartRecording()
         m_pathRecorder->startRecording();
         answer = make_unique<Record_MessageToSend>(true, "Record started");
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
         answer = make_unique<Record_MessageToSend>(false, "Cannot start record : " + string(e.what()));
     }
@@ -83,7 +89,7 @@ void AndroidReceiver_ThreadClass::handleEndRecording()
         // TODO : launch an app to store to DB
         answer = make_unique<Record_MessageToSend>(true, "Record ended");
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
         answer = make_unique<Record_MessageToSend>(false, "Cannot end record");
     }
@@ -108,4 +114,30 @@ void AndroidReceiver_ThreadClass::handleAckMessage(Ack_MessageReceived* ackMessa
     // Only thing to do is to respond here
     auto answer = make_unique<Ack_MessageToSend>(true);
     m_appMessagesHolder->add(move(answer));
+}
+
+void AndroidReceiver_ThreadClass::sendDroneInfos()
+{
+    auto droneInfos = createDroneInfos();
+    m_appMessagesHolder->add(move(droneInfos));
+}
+
+unique_ptr<DroneInfos_MessageToSend> AndroidReceiver_ThreadClass::createDroneInfos()
+{
+    auto droneInfos = make_unique<DroneInfos_MessageToSend>();
+    auto globalPos = m_drone->global_position_int;
+
+    droneInfos->isArmed = m_drone->motors == Drone_Motors::ARM;
+    droneInfos->isRecording = m_pathRecorder->isRecording();
+    droneInfos->batteryRemaining = m_drone->battery_status.battery_remaining;
+    droneInfos->lat = globalPos.lat;
+    droneInfos->lon = globalPos.lon;
+    droneInfos->alt = globalPos.alt;
+    droneInfos->relativeAlt = globalPos.relative_alt;
+    droneInfos->vx = globalPos.vx;
+    droneInfos->vy = globalPos.vy;
+    droneInfos->vz = globalPos.vz;
+    droneInfos->yawRotation = globalPos.hdg;
+
+    return droneInfos;
 }

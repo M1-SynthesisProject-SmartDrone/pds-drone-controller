@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
     vector<unique_ptr<Abstract_ThreadClass>> threads;
     threads.push_back(
         make_unique<AndroidReceiver_ThreadClass>(
+            drone,
             androidMediator,
             pathRecorderHandler,
             toAppMessagesHolder,
