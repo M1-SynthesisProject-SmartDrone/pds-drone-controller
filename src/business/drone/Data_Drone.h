@@ -26,7 +26,7 @@
 #include "network/Com_Serial.h"
 #include "network/Com_Wifi.h"
 
-#include "drone/DroneManualCommand.h"
+#include "business/drone/DroneManualCommand.h"
 
  //#include "common/mavlink_msg_compassmot_status.h"
 

@@ -21,8 +21,7 @@
 #include "network/Com_Serial.h"
 #include "network/Com_Mavlink.h"
 
-#include "drone/Data_Drone.h"
-#include "drone/DroneManualCommand.h"
+#include "business/drone/Data_Drone.h"
 
 #include "threads/bridges/ToDroneMessagesHolder.h"
 #include "threads/bridges/ToAppMessagesHolder.h"
