@@ -9,7 +9,8 @@ AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(
     std::shared_ptr<AndroidMediator> androidMediator,
     std::shared_ptr<PathRecorderHandler> pathRecorderHandler,
     std::shared_ptr<ToAppMessagesHolder> appMessagesHolder,
-    std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder
+    std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder,
+    std::shared_ptr<ProcessExecutor> processExecutor
 ) : Abstract_ThreadClass(1000, 200)
 {
     m_drone = drone;
@@ -17,6 +18,7 @@ AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(
     m_droneMessageHolder = droneMessageHolder;
     m_appMessagesHolder = appMessagesHolder;
     m_pathRecorder = pathRecorderHandler;
+    m_processExecutor = processExecutor;
 }
 
 AndroidReceiver_ThreadClass::~AndroidReceiver_ThreadClass()
@@ -65,6 +67,19 @@ void AndroidReceiver_ThreadClass::run()
     }
 }
 
+void AndroidReceiver_ThreadClass::handleRecordMessage(Record_MessageReceived* recordMessage)
+{
+    if (recordMessage->record)
+    {
+        handleStartRecording();
+    }
+    else
+    {
+        handleEndRecording();
+        string command = "";
+    }
+}
+
 void AndroidReceiver_ThreadClass::handleStartRecording()
 {
     unique_ptr<Record_MessageToSend> answer;
@@ -86,7 +101,7 @@ void AndroidReceiver_ThreadClass::handleEndRecording()
     try
     {
         string filename = m_pathRecorder->stopRecording();
-        // TODO : launch an app to store to DB
+        m_processExecutor->launchSavePath(filename);
         answer = make_unique<Record_MessageToSend>(true, "Record ended");
     }
     catch (const std::exception& e)
@@ -94,19 +109,6 @@ void AndroidReceiver_ThreadClass::handleEndRecording()
         answer = make_unique<Record_MessageToSend>(false, "Cannot end record");
     }
     m_appMessagesHolder->add(move(answer));
-}
-
-void AndroidReceiver_ThreadClass::handleRecordMessage(Record_MessageReceived* recordMessage)
-{
-    if (recordMessage->record)
-    {
-        handleStartRecording();
-    }
-    else
-    {
-        handleEndRecording();
-        string command = "";
-    }
 }
 
 void AndroidReceiver_ThreadClass::handleAckMessage(Ack_MessageReceived* ackMessage)

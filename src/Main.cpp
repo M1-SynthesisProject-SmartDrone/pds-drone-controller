@@ -57,7 +57,8 @@ int main(int argc, char* argv[])
             androidMediator,
             pathRecorderHandler,
             toAppMessagesHolder,
-            toDroneMessagesHolder
+            toDroneMessagesHolder,
+            processExecutor
         ));
     threads.push_back(
         make_unique<AndroidSender_ThreadClass>(
@@ -138,9 +139,9 @@ void checkDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate)
         throw runtime_error(ss.str());
     }
     // TODO : create messages to handle this in a better way
-    // If GPS enabled
-    // drone->setMode_manual();
     // If GPS disabled
+    // drone->setMode_manual();
+    // If GPS enabled
     drone->setMode_position();
     usleep(1000 * 10); // 10ms
 }

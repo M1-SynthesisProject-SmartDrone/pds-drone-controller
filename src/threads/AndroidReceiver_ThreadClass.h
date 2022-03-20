@@ -14,6 +14,7 @@
 #include "threads/bridges/ToAppMessagesHolder.h"
 #include "threads/bridges/PathRecorderHandler.h"
 #include "drone/Data_Drone.h"
+#include "process/ProcessExecutor.h"
 #include "android/network/AndroidMediator.h"
 #include "android/converter/Json_AndroidMessageConverter.h"
 
@@ -25,6 +26,7 @@ private:
     std::shared_ptr<ToAppMessagesHolder> m_appMessagesHolder;
     std::shared_ptr<AndroidMediator> m_mediator;
     std::shared_ptr<PathRecorderHandler> m_pathRecorder;
+    std::shared_ptr<ProcessExecutor> m_processExecutor;
 
     void handleRecordMessage(Record_MessageReceived* recordMessage);
     void handleStartRecording();
@@ -40,7 +42,8 @@ public:
         std::shared_ptr<AndroidMediator> androidMediator,
         std::shared_ptr<PathRecorderHandler> pathRecorderHandler,
         std::shared_ptr<ToAppMessagesHolder> appMessagesHolder,
-        std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder
+        std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder,
+        std::shared_ptr<ProcessExecutor> processExecutor
     );
     ~AndroidReceiver_ThreadClass();
 

@@ -22,10 +22,7 @@ ProcessExecutor::ProcessExecutor(std::string pathSaverFilename, bool checkFilePr
     }
 }
 
-ProcessExecutor::~ProcessExecutor()
-{
-
-}
+ProcessExecutor::~ProcessExecutor() {}
 
 void ProcessExecutor::launchSavePath(std::string inputFilename)
 {
