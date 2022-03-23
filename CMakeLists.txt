@@ -22,8 +22,8 @@ set(APP_NAME SmartDroneController)
 
 # OUTPUT DIR SETTINGS
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 
 # COMPILER OPTIONS
 set(CMAKE_CXX_STANDARD 17)
@@ -81,7 +81,6 @@ include_directories(${CURSES_INCLUDE_DIR})
 
 link_libraries(
     # ${CXXOPTS_LIB}
-   #  ${RAPIDJSON_LIB}
     # ${BL_LIBRARIES} 
     # ${MAVLINK_LIB}
    #  ${LOGURU_LIB}
@@ -122,6 +121,6 @@ target_link_libraries(${APP_NAME} PUBLIC
     cxxopts 
     mavlink
     loguru
-    rapidjson
+    nlohmann
     -lconfig++
 )

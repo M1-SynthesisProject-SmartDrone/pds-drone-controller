@@ -54,6 +54,7 @@ void AndroidReceiver_ThreadClass::run()
             {
                 sendDroneInfos();
             }
+            break;
             default:
                 // No special case, send it to drone sender
                 m_droneMessageHolder->add(move(messageReceived));

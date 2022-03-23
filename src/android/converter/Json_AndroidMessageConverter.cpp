@@ -1,7 +1,6 @@
 #include "Json_AndroidMessageConverter.h"
 
 using namespace std;
-using namespace rapidjson;
 
 Json_AndroidMessageConverter::Json_AndroidMessageConverter()
 {
@@ -20,6 +19,4 @@ Abstract_AndroidReceivedMessage* Json_AndroidMessageConverter::convertMessageRec
 string Json_AndroidMessageConverter::convertToSendMessage(Abstract_AndroidToSendMessage* message)
 {
     return m_toSendMessagesConverter->convertToSendMessage(message);
-
-    
 }

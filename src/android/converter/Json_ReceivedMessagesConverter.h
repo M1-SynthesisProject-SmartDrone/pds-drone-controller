@@ -5,8 +5,7 @@
 #include <unordered_map>
 #include <functional>
 
-#include <rapidjson/rapidjson.h>
-#include <rapidjson/document.h>
+#include <nlohmann/json.hpp>
 
 #include "android/message/received/Abstract_AndroidReceivedMessage.h"
 #include "android/message/received/Ack_MessageReceived.h"
@@ -18,14 +17,14 @@
 class Json_ReceivedMessagesConverter
 {
 private:
-    Ack_MessageReceived* parseAckRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-    Start_MessageReceived* parseStartRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-    Record_MessageReceived* parseRecordRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-    Manual_MessageReceived* parseManualRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj);
-    DroneInfos_MessageReceived* parseDroneInfosRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj);
+    Ack_MessageReceived* parseAckRequest(nlohmann::json& obj);
+    Start_MessageReceived* parseStartRequest(nlohmann::json& obj);
+    Record_MessageReceived* parseRecordRequest(nlohmann::json& obj);
+    Manual_MessageReceived* parseManualRequest(nlohmann::json& obj);
+    DroneInfos_MessageReceived* parseDroneInfosRequest(nlohmann::json& obj);
 
-    std::function<Abstract_AndroidReceivedMessage*(rapidjson::GenericObject<false, rapidjson::Value>&)> 
-        findMessageConverterFunc(rapidjson::Document &document);
+    std::function<Abstract_AndroidReceivedMessage*(nlohmann::json&)> 
+        findMessageConverterFunc(nlohmann::json& document);
 
     /**
      * This map contains method references (as lambdas) to converters for each message type (key are strings).
@@ -35,7 +34,7 @@ private:
         std::string,
         // This is a bit long, but it is better not to throw aliases in header files
         // And yes, lambdas are a bit ugly in c++, but safier than raw function pointers (and std::bind)
-        std::function<Abstract_AndroidReceivedMessage*(rapidjson::GenericObject<false, rapidjson::Value>&)>
+        std::function<Abstract_AndroidReceivedMessage*(nlohmann::json&)>
         > CONVERTER_FROM_STR {
         {"ACK", [this](auto content) {return parseAckRequest(content);}},
         {"START_DRONE", [this](auto content) {return parseStartRequest(content);}},

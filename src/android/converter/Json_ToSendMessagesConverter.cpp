@@ -3,22 +3,16 @@
 #include <loguru/loguru.hpp>
 #include <algorithm>
 
-#include <rapidjson/rapidjson.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/document.h>
-
 using namespace std;
-using namespace rapidjson;
 
 Json_ToSendMessagesConverter::Json_ToSendMessagesConverter()
 {
-    
+
 }
 
 Json_ToSendMessagesConverter::~Json_ToSendMessagesConverter()
 {
-    
+
 }
 
 std::string Json_ToSendMessagesConverter::convertToSendMessage(Abstract_AndroidToSendMessage* message)
@@ -26,13 +20,8 @@ std::string Json_ToSendMessagesConverter::convertToSendMessage(Abstract_AndroidT
     try
     {
         auto messageConverterFunc = findConverter(message);
-        Document document = messageConverterFunc(message);
-        StringBuffer buffer;
-        buffer.Clear();
-        Writer<StringBuffer, Document::EncodingType, UTF8<>> writer(buffer);
-        document.Accept(writer);
-        string convertedStr(buffer.GetString());
-        return convertedStr;
+        nlohmann::json document = messageConverterFunc(message);
+        return document.dump();
     }
     catch (const std::exception& e)
     {
@@ -41,8 +30,8 @@ std::string Json_ToSendMessagesConverter::convertToSendMessage(Abstract_AndroidT
     }
 }
 
-std::function<rapidjson::Document(Abstract_AndroidToSendMessage*)> 
-    Json_ToSendMessagesConverter::findConverter(Abstract_AndroidToSendMessage* message)
+std::function<nlohmann::json(Abstract_AndroidToSendMessage*)>
+Json_ToSendMessagesConverter::findConverter(Abstract_AndroidToSendMessage* message)
 {
     const auto messageTypeIterator = CONVERTER_PER_TYPE.find(message->messageType);
     if (messageTypeIterator != CONVERTER_PER_TYPE.end())
@@ -57,65 +46,54 @@ std::function<rapidjson::Document(Abstract_AndroidToSendMessage*)>
 }
 
 // ==== CONVERTERS ====
-Document createBaseDocument(char* messageType)
+nlohmann::json createBaseDocument(char* messageType)
 {
-    Document document;
-    document.SetObject();
-
-    Document::AllocatorType& allocator = document.GetAllocator();
-    document.AddMember("type", StringRef(messageType), allocator);
+    nlohmann::json document;
+    document["type"] = messageType;
     return document;
 }
 
 // This is a shortcut for answer messages types, that have nearly the same shape
-Document convertAnswerMessage(char*  messageType, Abstract_Answer_MessageToSend* answer)
+nlohmann::json convertAnswerMessage(char* messageType, Abstract_Answer_MessageToSend* answer)
 {
-    Document document = createBaseDocument(messageType);
-    Document::AllocatorType& allocator = document.GetAllocator();
-    Value content(kObjectType);
-    {
-        content.AddMember("validated", answer->validated, allocator);
-        content.AddMember("message", StringRef(answer->message.c_str()), allocator);
-    }
-    document.AddMember("content", content, allocator);
+    nlohmann::json document = createBaseDocument(messageType);
+
+    document["content"]["validated"] = answer->validated;
+    document["content"]["message"] = answer->message;
 
     return document;
 }
 
-Document Json_ToSendMessagesConverter::convertAck(Ack_MessageToSend* ackMessage)
+nlohmann::json Json_ToSendMessagesConverter::convertAck(Ack_MessageToSend* ackMessage)
 {
     return convertAnswerMessage("RESP_ACK", ackMessage);
 }
 
-Document Json_ToSendMessagesConverter::convertRecord(Record_MessageToSend* recordMessage)
+nlohmann::json Json_ToSendMessagesConverter::convertRecord(Record_MessageToSend* recordMessage)
 {
     return convertAnswerMessage("RESP_RECORD", recordMessage);
 }
 
-Document Json_ToSendMessagesConverter::convertStartDrone(StartDrone_MessageToSend* startDroneMessage)
+nlohmann::json Json_ToSendMessagesConverter::convertStartDrone(StartDrone_MessageToSend* startDroneMessage)
 {
     return convertAnswerMessage("RESP_START_DRONE", startDroneMessage);
 }
 
-Document Json_ToSendMessagesConverter::convertDroneInfos(DroneInfos_MessageToSend* droneInfos)
+nlohmann::json Json_ToSendMessagesConverter::convertDroneInfos(DroneInfos_MessageToSend* droneInfos)
 {
-    Document document = createBaseDocument("RESP_DRONE_INFOS");
-    Document::AllocatorType& allocator = document.GetAllocator();
-    Value content(kObjectType);
-    {
-        content.AddMember("armed", droneInfos->isArmed, allocator);
-        content.AddMember("recording", droneInfos->isRecording, allocator);
-        content.AddMember("batteryRemaining", droneInfos->batteryRemaining, allocator);
-        content.AddMember("lat", droneInfos->lat, allocator);
-        content.AddMember("lon", droneInfos->lon, allocator);
-        content.AddMember("alt", droneInfos->alt, allocator);
-        content.AddMember("relativeAlt", droneInfos->relativeAlt, allocator);
-        content.AddMember("vx", droneInfos->vx, allocator);
-        content.AddMember("vy", droneInfos->vy, allocator);
-        content.AddMember("vz", droneInfos->vz, allocator);
-        content.AddMember("yawRotation", droneInfos->yawRotation, allocator);
-    }
-    document.AddMember("content", content, allocator);
+    nlohmann::json document = createBaseDocument("RESP_DRONE_INFOS");
+
+    document["content"]["armed"] = droneInfos->isArmed;
+    document["content"]["recording"] = droneInfos->isRecording;
+    document["content"]["batteryRemaining"] = droneInfos->batteryRemaining;
+    document["content"]["lat"] = droneInfos->lat;
+    document["content"]["lon"] = droneInfos->lon;
+    document["content"]["alt"] = droneInfos->alt;
+    document["content"]["relativeAlt"] = droneInfos->relativeAlt;
+    document["content"]["vx"] = droneInfos->vx;
+    document["content"]["vy"] = droneInfos->vy;
+    document["content"]["vz"] = droneInfos->vz;
+    document["content"]["yawRotation"] = droneInfos->yawRotation;
 
     return document;
 }

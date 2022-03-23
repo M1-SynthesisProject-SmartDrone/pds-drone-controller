@@ -5,10 +5,7 @@
 #include <functional>
 #include <unordered_map>
 
-#include <rapidjson/rapidjson.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/document.h>
+#include <nlohmann/json.hpp>
 
 #include "android/message/tosend/Abstract_AndroidToSendMessage.h"
 #include "android/message/tosend/Ack_MessageToSend.h"
@@ -19,16 +16,16 @@
 class Json_ToSendMessagesConverter
 {
 private:
-    rapidjson::Document convertAck(Ack_MessageToSend* ackMessage);
-    rapidjson::Document convertDroneInfos(DroneInfos_MessageToSend* droneInfosMessage);
-    rapidjson::Document convertRecord(Record_MessageToSend* recordMessage);
-    rapidjson::Document convertStartDrone(StartDrone_MessageToSend* startDroneMessage);
+    nlohmann::json convertAck(Ack_MessageToSend* ackMessage);
+    nlohmann::json convertDroneInfos(DroneInfos_MessageToSend* droneInfosMessage);
+    nlohmann::json convertRecord(Record_MessageToSend* recordMessage);
+    nlohmann::json convertStartDrone(StartDrone_MessageToSend* startDroneMessage);
     
-    std::function<rapidjson::Document(Abstract_AndroidToSendMessage*)> findConverter(Abstract_AndroidToSendMessage* message);
+    std::function<nlohmann::json(Abstract_AndroidToSendMessage*)> findConverter(Abstract_AndroidToSendMessage* message);
     /**
      * For each message that we can treat, assing a lambda that converts it to the wanted format
      */
-    const std::unordered_map<MESSAGE_TYPE, std::function<rapidjson::Document(Abstract_AndroidToSendMessage*)>> CONVERTER_PER_TYPE {
+    const std::unordered_map<MESSAGE_TYPE, std::function<nlohmann::json(Abstract_AndroidToSendMessage*)>> CONVERTER_PER_TYPE {
         {MESSAGE_TYPE::RESP_ACK, [this](auto msg){return convertAck(static_cast<Ack_MessageToSend*>(msg));}},
         {MESSAGE_TYPE::RESP_DRONE_INFOS, [this](auto msg){return convertDroneInfos(static_cast<DroneInfos_MessageToSend*>(msg));}},
         {MESSAGE_TYPE::RESP_RECORD, [this](auto msg){return convertRecord(static_cast<Record_MessageToSend*>(msg));}},

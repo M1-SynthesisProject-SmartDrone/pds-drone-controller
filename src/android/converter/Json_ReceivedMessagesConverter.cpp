@@ -3,12 +3,6 @@
 #include <loguru/loguru.hpp>
 #include <algorithm>
 
-#include <rapidjson/rapidjson.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/document.h>
-
-using namespace rapidjson;
 using namespace std;
 
 Json_ReceivedMessagesConverter::Json_ReceivedMessagesConverter() {}
@@ -17,20 +11,20 @@ Json_ReceivedMessagesConverter::~Json_ReceivedMessagesConverter() {}
 
 Abstract_AndroidReceivedMessage* Json_ReceivedMessagesConverter::convertMessageReceived(std::string message)
 {
-    Document document;
-    document.Parse<kParseStopWhenDoneFlag>(message.c_str());
-
-    auto messageConverterFunc = findMessageConverterFunc(document);
-
-    Abstract_AndroidReceivedMessage* converted;
     try
     {
-        if (!document["content"].IsObject())
+        auto document = nlohmann::json::parse(message);
+
+        auto messageConverterFunc = findMessageConverterFunc(document);
+
+        Abstract_AndroidReceivedMessage* converted;
+        if (!document["content"].is_object())
         {
             throw invalid_argument("No content object found");
         }
-        GenericObject<false, Value> content = document["content"].GetObject();
+        auto content = document["content"];
         return messageConverterFunc(content);
+        return converted;
     }
     catch (exception& e)
     {
@@ -39,43 +33,41 @@ Abstract_AndroidReceivedMessage* Json_ReceivedMessagesConverter::convertMessageR
         LOG_F(ERROR, "Cannot parse the json %s : %s", message.c_str(), e.what());
         throw invalid_argument("Json value is not parsable");
     }
-
-    return converted;
 }
 
-Ack_MessageReceived* Json_ReceivedMessagesConverter::parseAckRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj)
+Ack_MessageReceived* Json_ReceivedMessagesConverter::parseAckRequest(nlohmann::json& obj)
 {
     return new Ack_MessageReceived();
 }
 
-Start_MessageReceived* Json_ReceivedMessagesConverter::parseStartRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj)
+Start_MessageReceived* Json_ReceivedMessagesConverter::parseStartRequest(nlohmann::json& obj)
 {
-    bool start = obj["startDrone"].GetBool();
+    bool start = obj["startDrone"];
     return new Start_MessageReceived{
         start
     };
 }
 
-Record_MessageReceived* Json_ReceivedMessagesConverter::parseRecordRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj)
+Record_MessageReceived* Json_ReceivedMessagesConverter::parseRecordRequest(nlohmann::json& obj)
 {
-    bool record = obj["record"].GetBool();
+    bool record = obj["record"];
     return new Record_MessageReceived{
         record
     };
 }
 
 
-DroneInfos_MessageReceived* Json_ReceivedMessagesConverter::parseDroneInfosRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj)
+DroneInfos_MessageReceived* Json_ReceivedMessagesConverter::parseDroneInfosRequest(nlohmann::json& obj)
 {
     return new DroneInfos_MessageReceived();
 }
 
-Manual_MessageReceived* Json_ReceivedMessagesConverter::parseManualRequest(rapidjson::GenericObject<false, rapidjson::Value>& obj)
+Manual_MessageReceived* Json_ReceivedMessagesConverter::parseManualRequest(nlohmann::json& obj)
 {
-    double leftMove = obj["y"].GetDouble();
-    double leftRotation = obj["r"].GetDouble();
-    double forwardMove = obj["x"].GetDouble();
-    double motorPower = obj["z"].GetDouble();
+    double leftMove = obj["y"];
+    double leftRotation = obj["r"];
+    double forwardMove = obj["x"];
+    double motorPower = obj["z"];
     return new Manual_MessageReceived{
         leftMove,
         leftRotation,
@@ -84,12 +76,12 @@ Manual_MessageReceived* Json_ReceivedMessagesConverter::parseManualRequest(rapid
     };
 }
 
-std::function<Abstract_AndroidReceivedMessage*(rapidjson::GenericObject<false, rapidjson::Value>&)> 
-    Json_ReceivedMessagesConverter::findMessageConverterFunc(rapidjson::Document &document)
+std::function<Abstract_AndroidReceivedMessage* (nlohmann::json&)>
+Json_ReceivedMessagesConverter::findMessageConverterFunc(nlohmann::json& document)
 {
-    if (document.HasMember("type"))
+    if (document.contains("type"))
     {
-        const string typeStr(document["type"].GetString());
+        const string typeStr(document["type"]);
         const auto messageTypeIterator = CONVERTER_FROM_STR.find(typeStr);
         if (messageTypeIterator != CONVERTER_FROM_STR.end())
         {
