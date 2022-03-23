@@ -25,6 +25,11 @@ struct ConfigExes
     std::string saverExePath;
 };
 
+struct ConfigDataServer
+{
+    std::string rootUrl;
+};
+
 /**
  * The struct containing all config params
  */
@@ -34,13 +39,15 @@ struct ConfigParams
     ConfigDrone droneParams;
     ConfigApp appParams;
     ConfigExes exesParams;
+    ConfigDataServer dataServerParams;
 
-    ConfigParams(ConfigGlobal global, ConfigDrone drone, ConfigApp app, ConfigExes exes)
+    ConfigParams(ConfigGlobal global, ConfigDrone drone, ConfigApp app, ConfigExes exes, ConfigDataServer dataServer)
     {
         this->globalParams = global;
         this->droneParams = drone;
         this->appParams = app;
         this->exesParams = exes;
+        this->dataServerParams = dataServer;
     }
 };
 

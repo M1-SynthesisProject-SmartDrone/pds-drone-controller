@@ -10,7 +10,8 @@ AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(
     std::shared_ptr<PathRecorderHandler> pathRecorderHandler,
     std::shared_ptr<ToAppMessagesHolder> appMessagesHolder,
     std::shared_ptr<ToDroneMessagesHolder> droneMessageHolder,
-    std::shared_ptr<ProcessExecutor> processExecutor
+    std::shared_ptr<ProcessExecutor> processExecutor,
+    std::shared_ptr<ApiHandler> apiHandler
 ) : Abstract_ThreadClass(1000, 200)
 {
     m_drone = drone;
@@ -19,6 +20,7 @@ AndroidReceiver_ThreadClass::AndroidReceiver_ThreadClass(
     m_appMessagesHolder = appMessagesHolder;
     m_pathRecorder = pathRecorderHandler;
     m_processExecutor = processExecutor;
+    m_apiHandler = apiHandler;
 }
 
 AndroidReceiver_ThreadClass::~AndroidReceiver_ThreadClass()

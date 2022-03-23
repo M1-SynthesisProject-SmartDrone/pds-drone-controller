@@ -46,6 +46,9 @@ else()
     message("Fail : You must hae PkgConfig installed")
 endif()
 
+message("- Checking : Cpr")
+find_library(CPR_LIB cpr REQUIRED)
+
 # message("- Checking : libconfig")
 # find_package(libconfig++-dev REQUIRED)
 # if(libconfig++-dev_FOUND)
@@ -80,6 +83,7 @@ include_directories(${CURSES_INCLUDE_DIR})
 ######################################################################################################
 
 link_libraries(
+    ${CPR_LIB}  
     # ${CXXOPTS_LIB}
     # ${BL_LIBRARIES} 
     # ${MAVLINK_LIB}

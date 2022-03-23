@@ -16,10 +16,15 @@ drone:
     use_drone = false;
     serial_path = "/dev/ttyUSB0";
     baudrate = 57600;
-}
+};
 
 app:
 {
     send_port = 6869;
     receive_port = 6869;
-}
+};
+
+data_server:
+{
+    root_url = "http://localhost:8080";
+};

@@ -22,10 +22,11 @@
 #include "network/Com_Serial.h"
 #include "business/drone/Data_Drone.h"
 #include "process/ProcessExecutor.h"
+#include "data_server/ApiHandler/ApiHandler.h"
 
 using namespace std;
 
-const short DRONE_TIMEOUT_LIMIT = 10000;
+const short DRONE_TIMEOUT_LIMIT = 10;
 
 void handleDrone(bool useDrone, shared_ptr<Drone> drone, char* serialPath, int serialBaudrate);
 void checkDrone(shared_ptr<Drone> drone, char* serialPath, int serialBaudrate);
@@ -45,6 +46,7 @@ int main(int argc, char* argv[])
     auto messageConverter = make_shared<Json_AndroidMessageConverter>();
     auto pathRecorderHandler = make_shared<PathRecorderHandler>(params.globalParams.tmpFolderPath);
     auto processExecutor = make_shared<ProcessExecutor>(params.exesParams.saverExePath, params.exesParams.checkExesPresence);
+    auto apiHandler = make_shared<ApiHandler>(params.dataServerParams.rootUrl);
 
     bool useDrone = params.droneParams.useDrone;
     handleDrone(useDrone, drone, params.droneParams.serialPath.data(), params.droneParams.serialBaudrate);
@@ -58,7 +60,8 @@ int main(int argc, char* argv[])
             pathRecorderHandler,
             toAppMessagesHolder,
             toDroneMessagesHolder,
-            processExecutor
+            processExecutor,
+            apiHandler
         ));
     threads.push_back(
         make_unique<AndroidSender_ThreadClass>(

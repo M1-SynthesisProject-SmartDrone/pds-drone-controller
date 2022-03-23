@@ -56,11 +56,17 @@ ConfigParams ConfigParser::parse()
         exeSettings["path_saver"]
     };
 
+    const libconfig::Setting& dataServerSettings = root["data_server"];
+    auto dataServerConfig = ConfigDataServer{
+        dataServerSettings["root_url"],
+    };
+
     return ConfigParams(
         globalConfig,
         droneConfig,
         appConfig,
-        exesConfig
+        exesConfig,
+        dataServerConfig
     );
 }
 
