@@ -35,6 +35,7 @@ void AndroidReceiver_ThreadClass::run()
         try
         {
             auto messageReceived = m_mediator->receiveMessage();
+            cout << "Received Message" << messageReceived->toString() << "\n";
             // Special case, we want to handle record
             switch (messageReceived->messageType)
             {
@@ -54,6 +55,7 @@ void AndroidReceiver_ThreadClass::run()
             {
                 sendDroneInfos();
             }
+            break;
             default:
                 // No special case, send it to drone sender
                 m_droneMessageHolder->add(move(messageReceived));

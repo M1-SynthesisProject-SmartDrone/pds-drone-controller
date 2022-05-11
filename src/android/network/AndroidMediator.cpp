@@ -27,7 +27,7 @@ std::unique_ptr<Abstract_AndroidReceivedMessage> AndroidMediator::receiveMessage
     {
         LOG_F(ERROR, "Received bigger message than buffer could handle, message truncated");
     }
-
+    cout <<"BUFFER :\n"<< string(buffer) <<"\n";
     auto convertedMessage = m_converter->convertMessageReceived(string(buffer));
     return unique_ptr<Abstract_AndroidReceivedMessage>(convertedMessage);
 }

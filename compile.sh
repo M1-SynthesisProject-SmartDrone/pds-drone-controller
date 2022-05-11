@@ -5,5 +5,5 @@
 sudo mkdir build
 cd build
 cmake ..
-make
+make -j
 cd ..
